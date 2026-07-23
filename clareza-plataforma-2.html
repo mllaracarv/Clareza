@@ -1,0 +1,2605 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Clareza — Espaço de apoio neurodivergente</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,400;0,500;0,600;1,500&family=Atkinson+Hyperlegible:wght@400;700&family=Lexend:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js" defer></script>
+<style>
+/* ============================================================
+   CLAREZA — design tokens
+   Palette: sage-mist background, deep teal accent, muted gold
+   Display: Fraunces (hero only) · Body: Atkinson Hyperlegible
+   Alt reading font: Lexend (toggle) · Signature: breathing circle
+   ============================================================ */
+:root{
+  --bg:#F1F5F2;
+  --bg-elevated:#FFFFFF;
+  --bg-soft:#E7EEE8;
+  --text:#242A27;
+  --text-muted:#5B655F;
+  --border:#D9E2DB;
+  --accent:#3D7A6E;
+  --accent-dark:#2C5C53;
+  --accent-soft:#DCEAE6;
+  --accent-2:#C48A2E;
+  --accent-2-soft:#F3E6CC;
+  --success:#4C8567;
+  --success-soft:#E1EFE6;
+  --warn:#B5602F;
+  --warn-soft:#F5E4D9;
+  --danger:#B24A42;
+  --danger-soft:#F4E0DD;
+  --focus-ring:#1E5E52;
+  --radius-sm:8px;
+  --radius:14px;
+  --radius-lg:22px;
+  --shadow-sm:0 1px 3px rgba(36,42,39,0.06);
+  --shadow:0 6px 20px rgba(36,42,39,0.08);
+  --font-body:'Atkinson Hyperlegible', sans-serif;
+  --font-display:'Fraunces', serif;
+  --line-height:1.6;
+  --font-scale:1;
+  --brightness:1;
+  --motion:1;
+}
+[data-theme="dark"]{
+  --bg:#182220;
+  --bg-elevated:#202D2A;
+  --bg-soft:#243330;
+  --text:#EAEFEC;
+  --text-muted:#A7B5AE;
+  --border:#33443F;
+  --accent:#6FC2AF;
+  --accent-dark:#8FD6C4;
+  --accent-soft:#25423C;
+  --accent-2:#E0B15C;
+  --accent-2-soft:#3A3320;
+  --success:#7FC79C;
+  --success-soft:#1F3A2A;
+  --warn:#E2A876;
+  --warn-soft:#3A2A1C;
+  --danger:#E29089;
+  --danger-soft:#3B2624;
+  --focus-ring:#8FD6C4;
+  --shadow-sm:0 1px 3px rgba(0,0,0,0.3);
+  --shadow:0 6px 24px rgba(0,0,0,0.4);
+}
+[data-contrast="high"]{
+  --bg:#FFFFFF;
+  --bg-elevated:#FFFFFF;
+  --bg-soft:#F0F0F0;
+  --text:#000000;
+  --text-muted:#1A1A1A;
+  --border:#000000;
+  --accent:#0B5C4E;
+  --accent-dark:#063D33;
+  --accent-soft:#D7F0EA;
+  --accent-2:#7A4E00;
+  --accent-2-soft:#FCE9C2;
+  --success:#0B6B36;
+  --success-soft:#DCF3E3;
+  --warn:#8A3A00;
+  --danger:#8A1C13;
+  --shadow-sm:none;
+  --shadow:0 0 0 2px #000000;
+}
+[data-theme="dark"][data-contrast="high"]{
+  --bg:#000000;
+  --bg-elevated:#000000;
+  --bg-soft:#111111;
+  --text:#FFFFFF;
+  --text-muted:#F2F2F2;
+  --border:#FFFFFF;
+  --accent:#8FE6D2;
+  --accent-soft:#123028;
+  --accent-2:#FFD98A;
+  --focus-ring:#FFD98A;
+}
+*,*::before,*::after{box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+html,body{margin:0;padding:0;}
+body{
+  background:var(--bg);
+  color:var(--text);
+  font-family:var(--font-body);
+  font-size:calc(16px * var(--font-scale));
+  line-height:var(--line-height);
+  filter:brightness(var(--brightness));
+  -webkit-font-smoothing:antialiased;
+  transition:background .25s ease,color .25s ease;
+  min-height:100vh;
+}
+body.reduce-motion *{animation-duration:0.001ms !important;animation-iteration-count:1 !important;transition-duration:0.001ms !important;scroll-behavior:auto !important;}
+.a11y-desc{display:none;background:var(--bg-soft);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 14px;font-size:.86rem;color:var(--text-muted);max-width:44ch;text-align:left;margin:8px auto 0;}
+body.audio-desc-on .a11y-desc{display:block;}
+.caption-bar{display:none;align-items:center;gap:8px;font-size:.82rem;color:var(--text-muted);margin-top:8px;padding:6px 12px;background:var(--bg-soft);border-radius:999px;}
+.caption-bar .dot{width:7px;height:7px;border-radius:50%;background:var(--accent);flex:none;}
+body.captions-on .caption-bar.on{display:inline-flex;}
+#vlibras-status{position:fixed;bottom:16px;left:16px;z-index:150;}
+#visual-alert-flash{position:fixed;inset:0;pointer-events:none;z-index:250;border:0 solid var(--accent);opacity:0;}
+#visual-alert-flash.flash{animation:alertFlash .9s ease-out;}
+@keyframes alertFlash{0%{border-width:0;opacity:0;}15%{border-width:10px;opacity:1;}100%{border-width:0;opacity:0;}}
+body.reduce-motion #visual-alert-flash.flash{animation:none;border-width:10px;opacity:1;transition:opacity .6s ease .3s;}
+h1,h2,h3,h4{font-family:var(--font-display);font-weight:600;line-height:1.2;margin:0 0 .5em 0;letter-spacing:-0.01em;}
+h1{font-size:clamp(2.1rem,4vw,3.4rem);}
+h2{font-size:clamp(1.5rem,2.6vw,2.1rem);}
+h3{font-size:1.25rem;font-family:var(--font-body);font-weight:700;}
+p{margin:0 0 1em 0;color:var(--text);}
+a{color:var(--accent-dark);}
+button,input,select,textarea{font-family:inherit;font-size:1rem;color:inherit;}
+button{cursor:pointer;}
+img,svg{max-width:100%;display:block;}
+.visually-hidden{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;}
+:focus{outline:none;}
+:focus-visible{outline:3px solid var(--focus-ring);outline-offset:3px;border-radius:4px;}
+.skip-link{position:absolute;left:12px;top:-60px;background:var(--accent);color:#fff;padding:10px 16px;border-radius:var(--radius-sm);z-index:1000;transition:top .2s ease;}
+.skip-link:focus{top:12px;}
+
+/* layout helpers */
+.container{max-width:1180px;margin:0 auto;padding:0 24px;}
+.screen{display:none;min-height:100vh;}
+.screen.active{display:block;}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:13px 24px;border-radius:999px;border:1.5px solid transparent;font-weight:700;font-size:0.98rem;transition:transform .15s ease,box-shadow .15s ease,background .15s ease;text-decoration:none;}
+.btn:hover{transform:translateY(-1px);}
+.btn-primary{background:var(--accent);color:#fff;box-shadow:var(--shadow-sm);}
+.btn-primary:hover{background:var(--accent-dark);}
+.btn-secondary{background:var(--bg-elevated);color:var(--text);border-color:var(--border);}
+.btn-secondary:hover{border-color:var(--accent);}
+.btn-ghost{background:transparent;color:var(--accent-dark);padding:10px 14px;}
+.btn-block{width:100%;}
+.btn-sm{padding:8px 16px;font-size:0.88rem;}
+.btn:disabled{opacity:.5;cursor:not-allowed;transform:none;}
+.field{margin-bottom:18px;text-align:left;}
+.field label{display:block;font-weight:700;font-size:.92rem;margin-bottom:6px;}
+.field input,.field select,.field textarea{width:100%;padding:12px 14px;border-radius:var(--radius-sm);border:1.5px solid var(--border);background:var(--bg-elevated);color:var(--text);}
+.field input:focus-visible,.field select:focus-visible,.field textarea:focus-visible{border-color:var(--accent);}
+.field-hint{font-size:.82rem;color:var(--text-muted);margin-top:4px;}
+.card{background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:22px;box-shadow:var(--shadow-sm);}
+.badge{display:inline-flex;align-items:center;gap:6px;font-size:.78rem;font-weight:700;padding:4px 10px;border-radius:999px;background:var(--accent-soft);color:var(--accent-dark);}
+.pill{display:inline-flex;align-items:center;gap:6px;font-size:.8rem;padding:5px 12px;border-radius:999px;border:1px solid var(--border);background:var(--bg-soft);}
+
+/* ---------- breathing circle signature ---------- */
+.breath-wrap{position:relative;width:100%;aspect-ratio:1/1;max-width:420px;margin:0 auto;display:flex;align-items:center;justify-content:center;}
+.breath-ring{position:absolute;border-radius:50%;border:1.5px solid var(--accent);opacity:.35;}
+.breath-ring.r1{width:100%;height:100%;animation:breathe 8s ease-in-out infinite;}
+.breath-ring.r2{width:74%;height:74%;opacity:.5;animation:breathe 8s ease-in-out infinite .3s;}
+.breath-ring.r3{width:48%;height:48%;background:var(--accent-soft);opacity:.9;animation:breathe 8s ease-in-out infinite .6s;display:flex;align-items:center;justify-content:center;}
+@keyframes breathe{0%,100%{transform:scale(.85);}50%{transform:scale(1.05);}}
+
+/* ---------- top nav (landing) ---------- */
+.landing-nav{display:flex;align-items:center;justify-content:space-between;padding:22px 0;}
+.brand{display:flex;align-items:center;gap:10px;font-family:var(--font-display);font-weight:600;font-size:1.3rem;color:var(--text);text-decoration:none;}
+.brand-mark{width:34px;height:34px;border-radius:50%;background:conic-gradient(from 200deg,var(--accent),var(--accent-2),var(--accent));flex:none;}
+.landing-nav-links{display:flex;gap:28px;align-items:center;}
+.landing-nav-links a{color:var(--text-muted);text-decoration:none;font-weight:700;font-size:.95rem;}
+.landing-nav-links a:hover{color:var(--accent-dark);}
+.nav-actions{display:flex;gap:10px;align-items:center;}
+
+/* ---------- hero ---------- */
+.hero{display:grid;grid-template-columns:1.1fr 0.9fr;gap:60px;align-items:center;padding:56px 0 90px;}
+.hero-eyebrow{color:var(--accent-dark);font-weight:700;letter-spacing:.04em;text-transform:uppercase;font-size:.82rem;margin-bottom:14px;}
+.hero p.lead{font-size:1.15rem;color:var(--text-muted);max-width:52ch;}
+.hero-actions{display:flex;gap:14px;margin-top:28px;flex-wrap:wrap;}
+.hero-stats{display:flex;gap:32px;margin-top:44px;flex-wrap:wrap;}
+.hero-stat b{display:block;font-family:var(--font-display);font-size:1.6rem;color:var(--accent-dark);}
+.hero-stat span{color:var(--text-muted);font-size:.86rem;}
+
+.section{padding:70px 0;}
+.section-head{max-width:640px;margin:0 auto 44px;text-align:center;}
+.section-head p{color:var(--text-muted);}
+.eyebrow{color:var(--accent-dark);font-weight:700;letter-spacing:.04em;text-transform:uppercase;font-size:.78rem;}
+
+.feature-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;}
+.feature-card{background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:26px;}
+.feature-icon{width:46px;height:46px;border-radius:var(--radius-sm);background:var(--accent-soft);display:flex;align-items:center;justify-content:center;margin-bottom:16px;color:var(--accent-dark);}
+.feature-card h3{margin-bottom:8px;}
+.feature-card p{color:var(--text-muted);font-size:.94rem;margin:0;}
+
+.showcase{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;}
+.showcase .card{text-align:center;padding:20px 14px;}
+.showcase .card .ic{width:42px;height:42px;margin:0 auto 10px;color:var(--accent-dark);}
+.showcase .card h4{margin:0 0 4px;font-size:.98rem;font-family:var(--font-body);font-weight:700;}
+.showcase .card p{font-size:.82rem;color:var(--text-muted);margin:0;}
+
+.cta-band{background:linear-gradient(135deg,var(--accent-dark),var(--accent));color:#fff;border-radius:var(--radius-lg);padding:52px;text-align:center;}
+.cta-band h2{color:#fff;}
+.cta-band p{color:rgba(255,255,255,.85);max-width:52ch;margin:0 auto 24px;}
+.cta-band .btn-secondary{background:#fff;color:var(--accent-dark);border-color:transparent;}
+
+footer.site-footer{border-top:1px solid var(--border);padding:36px 0;color:var(--text-muted);font-size:.86rem;display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px;}
+
+/* ---------- auth screens ---------- */
+.auth-wrap{min-height:100vh;display:grid;grid-template-columns:1fr 1fr;}
+.auth-visual{background:var(--accent-soft);display:flex;align-items:center;justify-content:center;padding:40px;position:relative;overflow:hidden;}
+.auth-visual .quote{position:relative;max-width:360px;background:var(--bg-elevated);border-radius:var(--radius);padding:24px;box-shadow:var(--shadow);}
+.auth-form-side{display:flex;align-items:center;justify-content:center;padding:40px;}
+.auth-box{width:100%;max-width:400px;}
+.auth-box .brand{margin-bottom:30px;}
+.auth-box h1{font-size:1.8rem;}
+.auth-box .sub{color:var(--text-muted);margin-bottom:26px;}
+.auth-switch{margin-top:20px;font-size:.92rem;color:var(--text-muted);text-align:center;}
+.auth-switch button{background:none;border:none;color:var(--accent-dark);font-weight:700;text-decoration:underline;padding:0;}
+.form-error{background:var(--danger-soft);color:var(--danger);border-radius:var(--radius-sm);padding:10px 14px;font-size:.9rem;margin-bottom:16px;display:none;}
+.form-success{background:var(--success-soft);color:var(--success);border-radius:var(--radius-sm);padding:10px 14px;font-size:.9rem;margin-bottom:16px;display:none;}
+.checkbox-row{display:flex;align-items:center;gap:8px;margin-bottom:18px;font-size:.92rem;}
+.checkbox-row input{width:auto;}
+
+/* ---------- app shell ---------- */
+.app-shell{display:grid;grid-template-columns:250px 1fr;min-height:100vh;}
+.sidebar{background:var(--bg-elevated);border-right:1px solid var(--border);padding:22px 16px;display:flex;flex-direction:column;gap:4px;position:sticky;top:0;height:100vh;overflow-y:auto;}
+.sidebar .brand{padding:0 10px 22px;}
+.side-link{display:flex;align-items:center;gap:12px;padding:11px 14px;border-radius:var(--radius-sm);text-decoration:none;color:var(--text-muted);font-weight:700;font-size:.94rem;border:none;background:none;width:100%;text-align:left;}
+.side-link svg{flex:none;width:20px;height:20px;}
+.side-link:hover{background:var(--bg-soft);color:var(--text);}
+.side-link.active{background:var(--accent-soft);color:var(--accent-dark);}
+.sidebar-foot{margin-top:auto;padding-top:14px;border-top:1px solid var(--border);}
+
+.topbar{display:flex;align-items:center;gap:16px;padding:16px 28px;border-bottom:1px solid var(--border);background:var(--bg-elevated);position:sticky;top:0;z-index:20;}
+.searchbox{flex:1;max-width:420px;display:flex;align-items:center;gap:10px;background:var(--bg-soft);border-radius:999px;padding:9px 16px;border:1.5px solid transparent;}
+.searchbox input{background:none;border:none;flex:1;outline:none;}
+.searchbox:focus-within{border-color:var(--accent);}
+.topbar-actions{display:flex;align-items:center;gap:10px;margin-left:auto;}
+.icon-btn{width:40px;height:40px;border-radius:50%;border:1.5px solid var(--border);background:var(--bg-elevated);display:flex;align-items:center;justify-content:center;color:var(--text);}
+.icon-btn:hover{border-color:var(--accent);color:var(--accent-dark);}
+.avatar{width:38px;height:38px;border-radius:50%;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;overflow:hidden;font-size:.9rem;}
+.avatar img{width:100%;height:100%;object-fit:cover;}
+
+.main-view{padding:28px;max-width:1180px;}
+.view-head{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:14px;}
+.view-head h1{font-size:1.7rem;margin-bottom:2px;}
+.view-head p{color:var(--text-muted);margin:0;}
+
+.mobile-tabbar{display:none;}
+
+/* dashboard */
+.stat-row{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:26px;}
+.stat-card{background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:18px 20px;}
+.stat-card b{display:block;font-family:var(--font-display);font-size:1.7rem;}
+.stat-card span{font-size:.84rem;color:var(--text-muted);}
+.dash-grid{display:grid;grid-template-columns:1.4fr 1fr;gap:20px;}
+.list-row{display:flex;align-items:center;gap:14px;padding:12px 0;border-bottom:1px solid var(--border);}
+.list-row:last-child{border-bottom:none;}
+.list-row .ic{width:38px;height:38px;border-radius:var(--radius-sm);background:var(--accent-soft);color:var(--accent-dark);display:flex;align-items:center;justify-content:center;flex:none;}
+.list-row .meta{flex:1;}
+.list-row .meta b{display:block;font-size:.94rem;}
+.list-row .meta span{font-size:.8rem;color:var(--text-muted);}
+.progress-bar{height:8px;border-radius:999px;background:var(--bg-soft);overflow:hidden;}
+.progress-bar > i{display:block;height:100%;background:var(--accent);border-radius:999px;}
+
+/* catalog grid (activities/games) */
+.filter-row{display:flex;gap:10px;margin-bottom:22px;flex-wrap:wrap;}
+.chip{padding:8px 16px;border-radius:999px;border:1.5px solid var(--border);background:var(--bg-elevated);font-weight:700;font-size:.86rem;color:var(--text-muted);}
+.chip.active{background:var(--accent);border-color:var(--accent);color:#fff;}
+.catalog-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;}
+.cat-card{background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:20px;display:flex;flex-direction:column;gap:10px;text-align:left;}
+.cat-card .ic{width:44px;height:44px;border-radius:var(--radius-sm);background:var(--accent-2-soft);color:var(--accent-2);display:flex;align-items:center;justify-content:center;}
+.cat-card h3{margin:0;font-size:1.02rem;}
+.cat-card p{color:var(--text-muted);font-size:.86rem;margin:0;flex:1;}
+.cat-card .cat-foot{display:flex;align-items:center;justify-content:space-between;margin-top:6px;}
+
+/* player shell for activity/game engines */
+.player-shell{background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius-lg);padding:26px;}
+.player-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;flex-wrap:wrap;gap:10px;}
+.diff-row{display:flex;gap:8px;}
+.player-stage{min-height:340px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;padding:20px 0;}
+.player-hud{display:flex;gap:22px;align-items:center;justify-content:center;margin-bottom:6px;flex-wrap:wrap;font-weight:700;font-size:.92rem;color:var(--text-muted);}
+.player-hud b{color:var(--text);}
+.tile-grid{display:grid;gap:12px;}
+.tile{aspect-ratio:1/1;border-radius:var(--radius-sm);border:2px solid var(--border);background:var(--bg-soft);display:flex;align-items:center;justify-content:center;font-weight:700;transition:transform .12s ease,background .12s ease,border-color .12s ease;}
+.tile:hover{border-color:var(--accent);}
+.tile.selected{border-color:var(--accent);background:var(--accent-soft);}
+.tile.correct{border-color:var(--success);background:var(--success-soft);}
+.tile.wrong{border-color:var(--danger);background:var(--danger-soft);}
+.tile.flipped{background:var(--bg-elevated);}
+.choice-list{display:grid;grid-template-columns:1fr 1fr;gap:12px;width:100%;max-width:520px;}
+.choice-btn{padding:16px;border-radius:var(--radius-sm);border:1.5px solid var(--border);background:var(--bg-soft);font-weight:700;text-align:left;}
+.choice-btn:hover{border-color:var(--accent);}
+.choice-btn.correct{border-color:var(--success);background:var(--success-soft);}
+.choice-btn.wrong{border-color:var(--danger);background:var(--danger-soft);}
+.result-panel{text-align:center;padding:20px;}
+.result-panel .score-big{font-family:var(--font-display);font-size:3rem;color:var(--accent-dark);}
+.dropzone{min-height:70px;border:2px dashed var(--border);border-radius:var(--radius-sm);padding:10px;display:flex;flex-wrap:wrap;gap:8px;align-content:flex-start;}
+.dropzone.over{border-color:var(--accent);background:var(--accent-soft);}
+.drag-chip{padding:8px 14px;border-radius:999px;background:var(--accent-2-soft);color:var(--accent-2);font-weight:700;border:1.5px solid transparent;cursor:grab;font-size:.88rem;}
+.maze-grid{display:grid;gap:2px;background:var(--border);border:2px solid var(--border);border-radius:var(--radius-sm);overflow:hidden;}
+.maze-cell{background:var(--bg-elevated);}
+.maze-cell.wall{background:var(--text);opacity:.85;}
+.maze-cell.goal{background:var(--success-soft);}
+.maze-cell.player{background:var(--accent);}
+
+/* chat */
+.chat-shell{display:grid;grid-template-columns:280px 1fr;border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;background:var(--bg-elevated);height:640px;}
+.chat-list{border-right:1px solid var(--border);padding:16px;overflow-y:auto;}
+.chat-contact{display:flex;gap:10px;align-items:center;padding:12px;border-radius:var(--radius-sm);background:var(--accent-soft);}
+.chat-contact .dot{width:9px;height:9px;border-radius:50%;background:var(--success);}
+.chat-main{display:flex;flex-direction:column;}
+.chat-header{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;}
+.chat-body{flex:1;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:12px;}
+.msg{max-width:70%;padding:12px 16px;border-radius:16px;font-size:.94rem;}
+.msg.bot{align-self:flex-start;background:var(--bg-soft);border-bottom-left-radius:4px;}
+.msg.me{align-self:flex-end;background:var(--accent);color:#fff;border-bottom-right-radius:4px;}
+.msg.system{align-self:center;background:none;color:var(--text-muted);font-size:.8rem;}
+.typing-dots{display:flex;gap:4px;align-self:flex-start;background:var(--bg-soft);padding:12px 16px;border-radius:16px;}
+.typing-dots span{width:6px;height:6px;border-radius:50%;background:var(--text-muted);animation:blink 1.2s infinite ease-in-out;}
+.typing-dots span:nth-child(2){animation-delay:.2s;}
+.typing-dots span:nth-child(3){animation-delay:.4s;}
+@keyframes blink{0%,80%,100%{opacity:.3;}40%{opacity:1;}}
+.chat-input-row{display:flex;gap:10px;padding:16px;border-top:1px solid var(--border);}
+.chat-input-row input{flex:1;padding:12px 16px;border-radius:999px;border:1.5px solid var(--border);background:var(--bg-soft);}
+.chat-suggest{display:flex;gap:8px;flex-wrap:wrap;padding:0 16px 12px;}
+.chat-suggest button{font-size:.8rem;padding:6px 12px;border-radius:999px;border:1px solid var(--border);background:var(--bg-elevated);}
+
+/* relax */
+.relax-grid{display:grid;grid-template-columns:1fr 1fr;gap:22px;}
+.sound-card{display:flex;align-items:center;gap:14px;padding:16px;border-radius:var(--radius);border:1.5px solid var(--border);background:var(--bg-elevated);}
+.sound-card.on{border-color:var(--accent);background:var(--accent-soft);}
+.sound-card .ic{width:40px;height:40px;border-radius:50%;background:var(--bg-soft);display:flex;align-items:center;justify-content:center;color:var(--accent-dark);flex:none;}
+.vol-slider{width:80px;}
+.breath-controls{display:flex;gap:10px;justify-content:center;margin-top:20px;flex-wrap:wrap;}
+.breath-phase{font-family:var(--font-display);font-size:1.3rem;color:var(--accent-dark);}
+.timer-display{font-family:var(--font-display);font-size:2.6rem;text-align:center;}
+
+/* agenda */
+.agenda-form{display:grid;grid-template-columns:2fr 1fr 1fr auto;gap:10px;align-items:end;margin-bottom:24px;}
+.task-row{display:flex;align-items:center;gap:14px;padding:14px 16px;border:1px solid var(--border);border-radius:var(--radius-sm);margin-bottom:10px;background:var(--bg-elevated);}
+.task-row.done{opacity:.55;}
+.task-row.done .task-title{text-decoration:line-through;}
+.task-check{width:24px;height:24px;border-radius:50%;border:2px solid var(--accent);background:none;flex:none;display:flex;align-items:center;justify-content:center;color:var(--accent);}
+.task-check.checked{background:var(--accent);color:#fff;}
+.task-title{font-weight:700;flex:1;}
+.task-meta{font-size:.82rem;color:var(--text-muted);}
+
+/* learn */
+.article-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:18px;}
+.article-card{background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:22px;}
+.article-card .tag{font-size:.76rem;color:var(--accent-dark);font-weight:700;text-transform:uppercase;letter-spacing:.03em;}
+.article-body{max-width:70ch;}
+.article-body p{color:var(--text);}
+.article-body h3{margin-top:1.4em;}
+.back-link{display:inline-flex;align-items:center;gap:6px;color:var(--text-muted);text-decoration:none;font-weight:700;margin-bottom:16px;background:none;border:none;padding:0;font-size:.92rem;}
+
+/* stats */
+.chart-card{background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius);padding:22px;}
+
+/* settings */
+.settings-grid{display:grid;grid-template-columns:260px 1fr;gap:26px;}
+.settings-tabs{display:flex;flex-direction:column;gap:4px;}
+.settings-tabs button{text-align:left;padding:11px 14px;border-radius:var(--radius-sm);border:none;background:none;color:var(--text-muted);font-weight:700;}
+.settings-tabs button.active{background:var(--accent-soft);color:var(--accent-dark);}
+.setting-row{display:flex;align-items:center;justify-content:space-between;padding:16px 0;border-bottom:1px solid var(--border);gap:20px;}
+.setting-row:last-child{border-bottom:none;}
+.setting-row .desc b{display:block;}
+.setting-row .desc span{font-size:.84rem;color:var(--text-muted);}
+.switch{position:relative;width:46px;height:26px;flex:none;}
+.switch input{opacity:0;width:100%;height:100%;position:absolute;margin:0;cursor:pointer;}
+.switch .track{position:absolute;inset:0;background:var(--border);border-radius:999px;transition:background .15s ease;}
+.switch .thumb{position:absolute;width:20px;height:20px;background:#fff;border-radius:50%;top:3px;left:3px;transition:transform .15s ease;box-shadow:0 1px 3px rgba(0,0,0,.3);}
+.switch input:checked + .track{background:var(--accent);}
+.switch input:checked ~ .thumb{transform:translateX(20px);}
+.switch input:focus-visible ~ .track{outline:3px solid var(--focus-ring);outline-offset:2px;}
+.range-row input[type=range]{width:180px;}
+.avatar-upload{display:flex;align-items:center;gap:16px;}
+.avatar-lg{width:72px;height:72px;border-radius:50%;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;font-size:1.5rem;font-weight:700;overflow:hidden;}
+.avatar-lg img{width:100%;height:100%;object-fit:cover;}
+
+/* accessibility panel */
+.a11y-overlay{position:fixed;inset:0;background:rgba(20,24,22,.4);z-index:90;display:none;}
+.a11y-overlay.active{display:block;}
+.a11y-panel{position:fixed;top:0;right:-380px;width:360px;max-width:92vw;height:100vh;background:var(--bg-elevated);z-index:91;box-shadow:-8px 0 30px rgba(0,0,0,.15);padding:24px;overflow-y:auto;transition:right .25s ease;}
+.a11y-panel.active{right:0;}
+.a11y-panel h2{font-size:1.2rem;}
+.a11y-group{margin-bottom:22px;}
+.a11y-group-label{font-weight:700;font-size:.88rem;color:var(--text-muted);margin-bottom:10px;display:block;}
+.seg-row{display:flex;gap:6px;}
+.seg-btn{flex:1;padding:9px 8px;border-radius:var(--radius-sm);border:1.5px solid var(--border);background:var(--bg-soft);font-weight:700;font-size:.84rem;}
+.seg-btn.active{border-color:var(--accent);background:var(--accent-soft);color:var(--accent-dark);}
+
+/* toast */
+#toast-region{position:fixed;bottom:20px;right:20px;display:flex;flex-direction:column;gap:10px;z-index:200;}
+.toast{background:var(--text);color:var(--bg);padding:12px 18px;border-radius:var(--radius-sm);box-shadow:var(--shadow);font-size:.9rem;font-weight:700;max-width:320px;}
+
+/* responsive */
+@media (max-width:960px){
+  .hero{grid-template-columns:1fr;gap:36px;}
+  .feature-grid{grid-template-columns:1fr 1fr;}
+  .showcase{grid-template-columns:1fr 1fr;}
+  .auth-wrap{grid-template-columns:1fr;}
+  .auth-visual{display:none;}
+  .app-shell{grid-template-columns:1fr;}
+  .sidebar{display:none;}
+  .main-view{padding:18px;padding-bottom:90px;}
+  .dash-grid{grid-template-columns:1fr;}
+  .stat-row{grid-template-columns:1fr 1fr;}
+  .catalog-grid{grid-template-columns:1fr 1fr;}
+  .relax-grid{grid-template-columns:1fr;}
+  .settings-grid{grid-template-columns:1fr;}
+  .article-grid{grid-template-columns:1fr;}
+  .chat-shell{grid-template-columns:1fr;height:auto;}
+  .chat-list{display:none;}
+  .mobile-tabbar{display:flex;position:fixed;bottom:0;left:0;right:0;background:var(--bg-elevated);border-top:1px solid var(--border);z-index:30;justify-content:space-around;padding:6px 0;}
+  .mobile-tabbar button{background:none;border:none;display:flex;flex-direction:column;align-items:center;gap:2px;color:var(--text-muted);font-size:.68rem;font-weight:700;padding:6px 4px;flex:1;}
+  .mobile-tabbar button.active{color:var(--accent-dark);}
+  .mobile-tabbar svg{width:20px;height:20px;}
+}
+@media (max-width:640px){
+  .feature-grid{grid-template-columns:1fr;}
+  .showcase{grid-template-columns:1fr 1fr;}
+  .catalog-grid{grid-template-columns:1fr;}
+  .stat-row{grid-template-columns:1fr 1fr;}
+  .choice-list{grid-template-columns:1fr;}
+  .agenda-form{grid-template-columns:1fr;}
+  .landing-nav-links{display:none;}
+}
+@media (prefers-reduced-motion:reduce){
+  .breath-ring{animation:none;}
+}
+</style>
+</head>
+<body>
+<a href="#main-content" class="skip-link">Pular para o conteúdo principal</a>
+<div id="toast-region" aria-live="polite" role="status"></div>
+<div id="route-announcer" class="visually-hidden" aria-live="polite"></div>
+<div id="visual-alert-flash" aria-hidden="true"></div>
+
+<!-- ============ LANDING ============ -->
+<section class="screen active" id="screen-landing">
+  <div class="container">
+    <nav class="landing-nav">
+      <a href="#" class="brand" data-nav="landing"><span class="brand-mark" aria-hidden="true"></span>Clareza</a>
+      <div class="landing-nav-links">
+        <a href="#recursos">Recursos</a>
+        <a href="#atividades">Atividades e jogos</a>
+        <a href="#aprendizado">Aprendizado</a>
+      </div>
+      <div class="nav-actions">
+        <button class="btn btn-ghost" data-action="go-login">Entrar</button>
+        <button class="btn btn-primary" data-action="go-signup">Criar conta</button>
+      </div>
+    </nav>
+
+    <div class="hero">
+      <div>
+        <div class="hero-eyebrow">Neurodivergência e acessibilidade real</div>
+        <h1>Um espaço calmo para pensar, aprender e se organizar do seu jeito.</h1>
+        <p class="lead">Clareza reúne atividades e jogos pensados para pessoas autistas, com TDAH e dislexia, além de recursos reais de acessibilidade para pessoas surdas e com deficiência visual — Libras, legendas, descrição de áudio e leitor de tela — em um ambiente sem excesso de estímulos, no seu ritmo.</p>
+        <div class="hero-actions">
+          <button class="btn btn-primary" data-action="go-signup">Começar agora</button>
+          <button class="btn btn-secondary" data-action="go-login">Já tenho conta</button>
+        </div>
+        <div class="hero-stats">
+          <div class="hero-stat"><b>20+</b><span>atividades e jogos</span></div>
+          <div class="hero-stat"><b>100%</b><span>ajustável e acessível</span></div>
+          <div class="hero-stat"><b>0</b><span>anúncios ou distrações</span></div>
+        </div>
+      </div>
+      <div class="breath-wrap" aria-hidden="true">
+        <div class="breath-ring r1"></div>
+        <div class="breath-ring r2"></div>
+        <div class="breath-ring r3"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section" id="recursos" style="background:var(--bg-soft);">
+    <div class="container">
+      <div class="section-head">
+        <div class="eyebrow">Como o Clareza ajuda</div>
+        <h2>Recursos pensados para o seu perfil</h2>
+        <p>Cada ferramenta foi construída para reduzir sobrecarga e apoiar autonomia, concentração e bem-estar.</p>
+      </div>
+      <div class="feature-grid">
+        <div class="feature-card">
+          <div class="feature-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 4.5a2.5 2.5 0 0 0-2.5 2.5v.3A2.7 2.7 0 0 0 5 9.8v1.4a2.7 2.7 0 0 0 1 2.1v1.2A2.5 2.5 0 0 0 8.5 17H9"/><path d="M15 4.5a2.5 2.5 0 0 1 2.5 2.5v.3A2.7 2.7 0 0 1 19 9.8v1.4a2.7 2.7 0 0 1-1 2.1v1.2A2.5 2.5 0 0 1 15.5 17H15"/><path d="M9 4.5V18a1.5 1.5 0 0 0 3 0V6a1.5 1.5 0 0 1 3-.5"/></svg></div>
+          <h3>Atividades cognitivas</h3>
+          <p>Exercícios de atenção, memória, raciocínio lógico e leitura, com níveis de dificuldade e feedback imediato.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="8" width="18" height="9" rx="3"/><path d="M8 12h-2m1-1v2"/><circle cx="16" cy="11.5" r=".6" fill="currentColor"/><circle cx="18" cy="13.5" r=".6" fill="currentColor"/></svg></div>
+          <h3>Jogos educativos</h3>
+          <p>Quebra-cabeças, labirintos, jogos de memória e de atenção — todos interativos e com registro de desempenho.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 5c-8 0-13 4-13 12 8 0 13-4 13-12Z"/><path d="M6.5 17.5 15 9"/></svg></div>
+          <h3>Área de relaxamento</h3>
+          <p>Sons calmos, respiração guiada e temporizadores de pausa para regular o ritmo do seu dia.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15" rx="2.2"/><path d="M8 3v4M16 3v4M3.5 10h17"/></svg></div>
+          <h3>Agenda simples</h3>
+          <p>Organize tarefas e lembretes com uma interface direta, sem sobrecarga visual.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 13.5c0 3 2 5.5 4.5 5.5S16 17 16 14.5 14.3 10 12 10s-3 1.5-3 3 1 2.2 2 2.2"/><path d="M8 13.5c-2 0-3.5-1.8-3.5-4.5A6.5 6.5 0 0 1 11 2.5c4 0 6.5 3 6.5 7"/></svg></div>
+          <h3>Para pessoas surdas</h3>
+          <p>Avatar tradutor de Libras (VLibras), legendas de texto em todos os sons e conteúdo escrito claro, sem depender de áudio.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12Z"/><circle cx="12" cy="12" r="3"/></svg></div>
+          <h3>Para baixa visão e cegueira</h3>
+          <p>Compatibilidade com leitores de tela, descrição de áudio em ilustrações, alto contraste, fonte ampliável e leitura em voz alta.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h9M17 6h3M4 12h3M9 12h11M4 18h13M19 18h1"/><circle cx="15" cy="6" r="2"/><circle cx="7" cy="12" r="2"/><circle cx="17" cy="18" r="2"/></svg></div>
+          <h3>Ajustes para fadiga visual e leitura</h3>
+          <p>Fonte de leitura facilitada, espaçamento entre linhas, modo escuro e navegação total por teclado — úteis também para dislexia e TDAH.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5.5A2 2 0 0 1 6 3.5h5V19H6a2 2 0 0 0-2 2Z"/><path d="M20 5.5A2 2 0 0 0 18 3.5h-5V19h5a2 2 0 0 1 2 2Z"/></svg></div>
+          <h3>Biblioteca de aprendizado</h3>
+          <p>Artigos sobre TEA, TDAH, dislexia, Libras, legendas e leitores de tela — informação prática, sem jargão.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section" id="atividades">
+    <div class="container">
+      <div class="section-head">
+        <div class="eyebrow">Catálogo</div>
+        <h2>Atividades e jogos interativos</h2>
+        <p>Um pouco do que você encontra assim que entra na plataforma.</p>
+      </div>
+      <div class="showcase" id="landing-showcase"></div>
+    </div>
+  </div>
+
+  <div class="section" id="aprendizado" style="background:var(--bg-soft);">
+    <div class="container">
+      <div class="cta-band">
+        <h2>Pronto para começar no seu ritmo?</h2>
+        <p>Crie sua conta gratuita e monte um espaço de apoio pensado para o seu jeito de processar o mundo.</p>
+        <button class="btn btn-secondary" data-action="go-signup">Criar minha conta</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="container">
+    <footer class="site-footer">
+      <span>Clareza — protótipo de plataforma de apoio neurodivergente.</span>
+      <span>Feito com foco em acessibilidade e bem-estar.</span>
+    </footer>
+  </div>
+</section>
+
+<!-- ============ LOGIN ============ -->
+<section class="screen" id="screen-login">
+  <div class="auth-wrap">
+    <div class="auth-visual">
+      <div class="breath-wrap" style="max-width:300px;position:absolute;opacity:.5;" aria-hidden="true">
+        <div class="breath-ring r1"></div><div class="breath-ring r2"></div><div class="breath-ring r3"></div>
+      </div>
+      <div class="quote">
+        <p style="margin-bottom:10px;">"Um lugar onde eu posso ir no meu próprio ritmo, sem me sentir pressionado."</p>
+        <span class="pill">Depoimento de usuário</span>
+      </div>
+    </div>
+    <div class="auth-form-side">
+      <div class="auth-box">
+        <a href="#" class="brand" data-nav="landing"><span class="brand-mark" aria-hidden="true"></span>Clareza</a>
+        <h1>Bem-vindo de volta</h1>
+        <p class="sub">Entre para continuar de onde parou.</p>
+        <div class="form-error" id="login-error" role="alert"></div>
+        <form id="form-login" novalidate>
+          <div class="field">
+            <label for="login-email">E-mail</label>
+            <input type="email" id="login-email" autocomplete="email" required>
+          </div>
+          <div class="field">
+            <label for="login-password">Senha</label>
+            <input type="password" id="login-password" autocomplete="current-password" required>
+          </div>
+          <div class="checkbox-row">
+            <input type="checkbox" id="login-keep" checked>
+            <label for="login-keep" style="font-weight:400;">Manter-me conectado</label>
+          </div>
+          <button type="submit" class="btn btn-primary btn-block">Entrar</button>
+        </form>
+        <p style="text-align:center;margin-top:14px;"><button class="btn btn-ghost btn-sm" data-action="go-forgot">Esqueci minha senha</button></p>
+        <div class="auth-switch">Ainda não tem conta? <button data-action="go-signup">Criar conta</button></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SIGNUP ============ -->
+<section class="screen" id="screen-signup">
+  <div class="auth-wrap">
+    <div class="auth-visual">
+      <div class="breath-wrap" style="max-width:300px;position:absolute;opacity:.5;" aria-hidden="true">
+        <div class="breath-ring r1"></div><div class="breath-ring r2"></div><div class="breath-ring r3"></div>
+      </div>
+      <div class="quote">
+        <p style="margin-bottom:10px;">Seu progresso, suas preferências de acessibilidade e sua rotina — tudo guardado com segurança.</p>
+        <span class="pill">Privacidade em primeiro lugar</span>
+      </div>
+    </div>
+    <div class="auth-form-side">
+      <div class="auth-box">
+        <a href="#" class="brand" data-nav="landing"><span class="brand-mark" aria-hidden="true"></span>Clareza</a>
+        <h1>Crie sua conta</h1>
+        <p class="sub">Leva menos de um minuto.</p>
+        <div class="form-error" id="signup-error" role="alert"></div>
+        <form id="form-signup" novalidate>
+          <div class="field">
+            <label for="signup-name">Nome</label>
+            <input type="text" id="signup-name" autocomplete="name" required>
+          </div>
+          <div class="field">
+            <label for="signup-email">E-mail</label>
+            <input type="email" id="signup-email" autocomplete="email" required>
+          </div>
+          <div class="field">
+            <label for="signup-password">Senha</label>
+            <input type="password" id="signup-password" autocomplete="new-password" required minlength="6">
+            <div class="field-hint">Mínimo de 6 caracteres.</div>
+          </div>
+          <button type="submit" class="btn btn-primary btn-block">Criar conta</button>
+        </form>
+        <div class="auth-switch">Já tem conta? <button data-action="go-login">Entrar</button></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FORGOT PASSWORD ============ -->
+<section class="screen" id="screen-forgot">
+  <div class="auth-wrap">
+    <div class="auth-visual">
+      <div class="breath-wrap" style="max-width:300px;position:absolute;opacity:.5;" aria-hidden="true">
+        <div class="breath-ring r1"></div><div class="breath-ring r2"></div><div class="breath-ring r3"></div>
+      </div>
+    </div>
+    <div class="auth-form-side">
+      <div class="auth-box">
+        <a href="#" class="brand" data-nav="landing"><span class="brand-mark" aria-hidden="true"></span>Clareza</a>
+        <h1>Recuperar senha</h1>
+        <p class="sub">Informe seu e-mail e enviaremos instruções de recuperação.</p>
+        <div class="form-error" id="forgot-error" role="alert"></div>
+        <div class="form-success" id="forgot-success" role="status"></div>
+        <form id="form-forgot" novalidate>
+          <div class="field">
+            <label for="forgot-email">E-mail</label>
+            <input type="email" id="forgot-email" autocomplete="email" required>
+          </div>
+          <button type="submit" class="btn btn-primary btn-block">Enviar instruções</button>
+        </form>
+        <div class="auth-switch"><button data-action="go-login">Voltar para o login</button></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ APP SHELL ============ -->
+<section class="screen" id="screen-app">
+  <div class="app-shell">
+    <aside class="sidebar" aria-label="Navegação principal">
+      <a href="#" class="brand" data-nav="landing"><span class="brand-mark" aria-hidden="true"></span>Clareza</a>
+      <button class="side-link" data-view="dashboard"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 11.5 12 4l8 7.5"/><path d="M6 10v8.5a1 1 0 0 0 1 1h3.5v-5.5h3v5.5H17a1 1 0 0 0 1-1V10"/></svg> Painel</button>
+      <button class="side-link" data-view="activities"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 4.5a2.5 2.5 0 0 0-2.5 2.5v.3A2.7 2.7 0 0 0 5 9.8v1.4a2.7 2.7 0 0 0 1 2.1v1.2A2.5 2.5 0 0 0 8.5 17H9"/><path d="M15 4.5a2.5 2.5 0 0 1 2.5 2.5v.3A2.7 2.7 0 0 1 19 9.8v1.4a2.7 2.7 0 0 1-1 2.1v1.2A2.5 2.5 0 0 1 15.5 17H15"/><path d="M9 4.5V18a1.5 1.5 0 0 0 3 0V6a1.5 1.5 0 0 1 3-.5"/></svg> Atividades</button>
+      <button class="side-link" data-view="games"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="8" width="18" height="9" rx="3"/><path d="M8 12h-2m1-1v2"/><circle cx="16" cy="11.5" r=".6" fill="currentColor"/><circle cx="18" cy="13.5" r=".6" fill="currentColor"/></svg> Jogos</button>
+      <button class="side-link" data-view="chat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5.5A1.5 1.5 0 0 1 5.5 4h13A1.5 1.5 0 0 1 20 5.5v9A1.5 1.5 0 0 1 18.5 16H10l-4.5 4v-4H5.5A1.5 1.5 0 0 1 4 14.5z"/></svg> Chat de apoio</button>
+      <button class="side-link" data-view="relax"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 5c-8 0-13 4-13 12 8 0 13-4 13-12Z"/><path d="M6.5 17.5 15 9"/></svg> Relaxamento</button>
+      <button class="side-link" data-view="agenda"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15" rx="2.2"/><path d="M8 3v4M16 3v4M3.5 10h17"/></svg> Agenda</button>
+      <button class="side-link" data-view="learn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5.5A2 2 0 0 1 6 3.5h5V19H6a2 2 0 0 0-2 2Z"/><path d="M20 5.5A2 2 0 0 0 18 3.5h-5V19h5a2 2 0 0 1 2 2Z"/></svg> Aprendizado</button>
+      <button class="side-link" data-view="stats"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg> Estatísticas</button>
+      <button class="side-link" data-view="accessibility"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12Z"/><circle cx="12" cy="12" r="3"/></svg> Acessibilidade</button>
+      <button class="side-link" data-view="settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h9M17 6h3M4 12h3M9 12h11M4 18h13M19 18h1"/><circle cx="15" cy="6" r="2"/><circle cx="7" cy="12" r="2"/><circle cx="17" cy="18" r="2"/></svg> Configurações</button>
+      <div class="sidebar-foot">
+        <button class="side-link" data-action="logout"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 4H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h3"/><path d="M15 8l4 4-4 4M9 12h10"/></svg> Sair</button>
+      </div>
+    </aside>
+
+    <div>
+      <header class="topbar">
+        <button class="icon-btn" id="btn-open-a11y" aria-haspopup="dialog" aria-controls="a11y-panel" title="Acessibilidade" aria-label="Abrir painel de acessibilidade"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h9M17 6h3M4 12h3M9 12h11M4 18h13M19 18h1"/><circle cx="15" cy="6" r="2"/><circle cx="7" cy="12" r="2"/><circle cx="17" cy="18" r="2"/></svg></button>
+        <div class="searchbox" role="search">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M20 20l-4.5-4.5"/></svg>
+          <input type="search" id="global-search" placeholder="Buscar atividades, jogos, artigos..." aria-label="Buscar no Clareza">
+        </div>
+        <div class="topbar-actions">
+          <button class="icon-btn" id="btn-tts" title="Ouvir esta página" aria-label="Ouvir conteúdo da página em voz alta"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9.5v5h3.5L13 19V5L7.5 9.5Z"/><path d="M17 9a4 4 0 0 1 0 6"/><path d="M19.5 6.5a8 8 0 0 1 0 11"/></svg></button>
+          <button class="icon-btn" id="btn-theme" title="Alternar modo escuro" aria-label="Alternar modo escuro"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a7 7 0 0 0 10.5 10.5Z"/></svg></button>
+          <button class="icon-btn" data-view="settings" title="Perfil" aria-label="Ir para o perfil">
+            <span class="avatar" id="topbar-avatar">C</span>
+          </button>
+        </div>
+      </header>
+
+      <main class="main-view" id="main-content">
+
+        <!-- DASHBOARD -->
+        <div class="view" id="view-dashboard">
+          <div class="view-head">
+            <div><h1 id="dash-greeting">Olá!</h1><p>Aqui está um resumo do seu progresso.</p></div>
+            <button class="btn btn-primary" data-view="activities">Começar uma atividade</button>
+          </div>
+          <div class="stat-row" id="dash-stats"></div>
+          <div class="dash-grid">
+            <div class="card">
+              <h3 style="margin-bottom:14px;">Jogos recomendados para você</h3>
+              <div id="dash-recommended"></div>
+            </div>
+            <div class="card">
+              <h3 style="margin-bottom:14px;">Últimas atividades</h3>
+              <div id="dash-recent"></div>
+            </div>
+          </div>
+          <div class="card" style="margin-top:20px;">
+            <h3 style="margin-bottom:14px;">Sua agenda de hoje</h3>
+            <div id="dash-agenda"></div>
+          </div>
+        </div>
+
+        <!-- ACTIVITIES CATALOG -->
+        <div class="view" id="view-activities" hidden>
+          <div class="view-head"><div><h1>Atividades</h1><p>Exercícios cognitivos com níveis de dificuldade e acompanhamento de progresso.</p></div></div>
+          <div class="catalog-grid" id="activities-grid"></div>
+        </div>
+
+        <!-- GAMES CATALOG -->
+        <div class="view" id="view-games" hidden>
+          <div class="view-head"><div><h1>Jogos</h1><p>Jogos educativos interativos, no seu ritmo.</p></div></div>
+          <div class="catalog-grid" id="games-grid"></div>
+        </div>
+
+        <!-- PLAYER (shared for activities and games) -->
+        <div class="view" id="view-player" hidden>
+          <button class="back-link" id="player-back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6"/></svg> Voltar</button>
+          <div class="player-shell">
+            <div class="player-head">
+              <div><h2 id="player-title" style="margin-bottom:2px;"></h2><p id="player-desc" style="margin:0;color:var(--text-muted);font-size:.92rem;"></p></div>
+              <div class="diff-row" id="player-diff"></div>
+            </div>
+            <div id="player-stage-wrap"></div>
+          </div>
+        </div>
+
+        <!-- CHAT -->
+        <div class="view" id="view-chat" hidden>
+          <div class="view-head"><div><h1>Chat de apoio</h1><p>Atendimento simulado para orientação e suporte.</p></div></div>
+          <div class="chat-shell">
+            <div class="chat-list">
+              <div class="chat-contact"><span class="avatar">A</span><div><b style="display:block;font-size:.92rem;">Ana · Equipe de apoio</b><span style="font-size:.78rem;color:var(--text-muted);display:flex;align-items:center;gap:5px;"><span class="dot"></span>on-line agora</span></div></div>
+            </div>
+            <div class="chat-main">
+              <div class="chat-header"><span class="avatar">A</span><div><b style="display:block;">Ana</b><span style="font-size:.8rem;color:var(--text-muted);">Equipe de apoio Clareza</span></div></div>
+              <div class="chat-body" id="chat-body"></div>
+              <div class="chat-suggest" id="chat-suggest"></div>
+              <form class="chat-input-row" id="chat-form">
+                <input type="text" id="chat-input" placeholder="Digite sua mensagem..." aria-label="Mensagem para o chat de apoio">
+                <button type="submit" class="btn btn-primary" aria-label="Enviar mensagem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 11.5 19 4 12 19l-2.4-6.1Z"/><path d="M9.6 12.9 19 4"/></svg></button>
+              </form>
+            </div>
+          </div>
+        </div>
+
+        <!-- RELAX -->
+        <div class="view" id="view-relax" hidden>
+          <div class="view-head"><div><h1>Área de relaxamento</h1><p>Um espaço para pausar, respirar e regular o ritmo.</p></div></div>
+          <div class="relax-grid">
+            <div class="card">
+              <h3 style="text-align:center;">Respiração guiada</h3>
+              <div class="breath-wrap" id="relax-breath" style="max-width:260px;">
+                <div class="breath-ring r1"></div>
+                <div class="breath-ring r2"></div>
+                <div class="breath-ring r3"><span class="breath-phase" id="breath-phase-text">Pronto</span></div>
+              </div>
+              <div class="breath-controls">
+                <button class="btn btn-primary btn-sm" id="breath-start">Iniciar respiração 4-4-6</button>
+                <button class="btn btn-secondary btn-sm" id="breath-stop">Parar</button>
+              </div>
+            </div>
+            <div class="card">
+              <h3 style="text-align:center;">Temporizador de pausa</h3>
+              <div class="timer-display" id="pause-timer-display">05:00</div>
+              <div class="breath-controls">
+                <button class="btn btn-secondary btn-sm" data-timer="60">1 min</button>
+                <button class="btn btn-secondary btn-sm" data-timer="300">5 min</button>
+                <button class="btn btn-secondary btn-sm" data-timer="600">10 min</button>
+                <button class="btn btn-primary btn-sm" id="pause-timer-start">Iniciar</button>
+              </div>
+            </div>
+            <div class="card" style="grid-column:1/-1;">
+              <h3 style="margin-bottom:14px;">Sons ambientes</h3>
+              <div class="stat-row" id="sounds-grid" style="grid-template-columns:repeat(3,1fr);"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- AGENDA -->
+        <div class="view" id="view-agenda" hidden>
+          <div class="view-head"><div><h1>Agenda</h1><p>Organize tarefas e lembretes da sua rotina.</p></div></div>
+          <div class="card">
+            <form class="agenda-form" id="agenda-form">
+              <div class="field" style="margin:0;"><label for="agenda-title">Tarefa</label><input type="text" id="agenda-title" required placeholder="Ex.: Ligar para o dentista"></div>
+              <div class="field" style="margin:0;"><label for="agenda-date">Data</label><input type="date" id="agenda-date"></div>
+              <div class="field" style="margin:0;"><label for="agenda-time">Hora</label><input type="time" id="agenda-time"></div>
+              <button type="submit" class="btn btn-primary">Adicionar</button>
+            </form>
+            <div id="agenda-list"></div>
+          </div>
+        </div>
+
+        <!-- LEARN -->
+        <div class="view" id="view-learn" hidden>
+          <div class="view-head"><div><h1>Aprendizado</h1><p>Artigos e guias sobre neurodivergência e estratégias práticas.</p></div></div>
+          <div class="article-grid" id="learn-grid"></div>
+        </div>
+        <div class="view" id="view-article" hidden>
+          <button class="back-link" id="article-back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6"/></svg> Voltar ao aprendizado</button>
+          <div class="card article-body" id="article-content"></div>
+        </div>
+
+        <!-- STATS -->
+        <div class="view" id="view-stats" hidden>
+          <div class="view-head"><div><h1>Estatísticas</h1><p>Acompanhe sua evolução ao longo do tempo.</p></div></div>
+          <div class="stat-row" id="stats-summary"></div>
+          <div class="dash-grid">
+            <div class="chart-card"><h3>Atividades concluídas por semana</h3><canvas id="chart-weekly" height="220"></canvas></div>
+            <div class="chart-card"><h3>Desempenho por categoria</h3><canvas id="chart-category" height="220"></canvas></div>
+          </div>
+          <div class="card" style="margin-top:20px;">
+            <h3 style="margin-bottom:14px;">Histórico de desempenho</h3>
+            <div id="stats-history"></div>
+          </div>
+        </div>
+
+        <!-- ACCESSIBILITY HUB -->
+        <div class="view" id="view-accessibility" hidden>
+          <div class="view-head"><div><h1>Acessibilidade</h1><p>Recursos dedicados para deficiência auditiva e deficiência visual, sempre visíveis e fáceis de encontrar.</p></div></div>
+
+          <div class="card" style="margin-bottom:20px;">
+            <div style="display:flex;align-items:center;gap:14px;margin-bottom:6px;">
+              <div class="ic" style="width:44px;height:44px;border-radius:var(--radius-sm);background:var(--accent-2-soft);color:var(--accent-2);display:flex;align-items:center;justify-content:center;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 13.5c0 3 2 5.5 4.5 5.5S16 17 16 14.5 14.3 10 12 10s-3 1.5-3 3 1 2.2 2 2.2"/><path d="M8 13.5c-2 0-3.5-1.8-3.5-4.5A6.5 6.5 0 0 1 11 2.5c4 0 6.5 3 6.5 7"/></svg></div>
+              <h2 style="margin:0;">Deficiência auditiva</h2>
+            </div>
+            <p style="color:var(--text-muted);margin-bottom:18px;">O Clareza não depende de som para funcionar: todo áudio tem um equivalente visual. Estes recursos tornam isso ainda mais explícito.</p>
+            <div class="setting-row"><div class="desc"><b>Tradução em Libras (VLibras)</b><span>Avatar público que traduz o texto da página para Língua Brasileira de Sinais</span></div>
+              <label class="switch"><input type="checkbox" data-a11y-toggle="vlibras" id="hub-vlibras"><span class="track"></span><span class="thumb"></span></label></div>
+            <div class="setting-row"><div class="desc"><b>Legendas de áudio</b><span>Mostra em texto o que está tocando em sons ambientes e alertas do sistema</span></div>
+              <label class="switch"><input type="checkbox" data-a11y-toggle="captions" id="hub-captions"><span class="track"></span><span class="thumb"></span></label></div>
+            <div class="setting-row"><div class="desc"><b>Alertas visuais reforçados</b><span>Destaca a tela com um flash visual sempre que houver um aviso sonoro importante</span></div>
+              <label class="switch"><input type="checkbox" data-a11y-toggle="visualAlerts" id="hub-visualalerts"><span class="track"></span><span class="thumb"></span></label></div>
+            <p style="font-size:.84rem;color:var(--text-muted);margin:14px 0 0;">Em todas as atividades e jogos, acertos e erros já aparecem por cor, ícone e texto — nunca apenas por som.</p>
+          </div>
+
+          <div class="card">
+            <div style="display:flex;align-items:center;gap:14px;margin-bottom:6px;">
+              <div class="ic" style="width:44px;height:44px;border-radius:var(--radius-sm);background:var(--accent-soft);color:var(--accent-dark);display:flex;align-items:center;justify-content:center;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12Z"/><circle cx="12" cy="12" r="3"/></svg></div>
+              <h2 style="margin:0;">Deficiência visual</h2>
+            </div>
+            <p style="color:var(--text-muted);margin-bottom:18px;">Estrutura semântica, navegação por teclado e leitura em voz alta em toda a plataforma — do login às atividades.</p>
+            <div class="setting-row"><div class="desc"><b>Leitura por voz</b><span>Lê em voz alta o conteúdo da página atual</span></div>
+              <button class="btn btn-secondary btn-sm" id="hub-tts-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9.5v5h3.5L13 19V5L7.5 9.5Z"/><path d="M17 9a4 4 0 0 1 0 6"/><path d="M19.5 6.5a8 8 0 0 1 0 11"/></svg> Ouvir esta página</button></div>
+            <div class="setting-row"><div class="desc"><b>Descrição de áudio</b><span>Revela em texto a descrição de ilustrações usadas nas atividades</span></div>
+              <label class="switch"><input type="checkbox" data-a11y-toggle="audioDesc" id="hub-audiodesc"><span class="track"></span><span class="thumb"></span></label></div>
+            <div class="setting-row"><div class="desc"><b>Alto contraste</b><span>Aumenta o contraste de cores em toda a interface</span></div>
+              <label class="switch"><input type="checkbox" data-a11y-toggle="contrast" id="hub-contrast"><span class="track"></span><span class="thumb"></span></label></div>
+            <div class="setting-row"><div class="desc"><b>Tamanho da fonte</b><span>Aumente o texto sem quebrar o layout</span></div>
+              <div class="seg-row" style="width:220px;">
+                <button class="seg-btn" data-a11y="fontScale" data-val="0.9">A-</button>
+                <button class="seg-btn" data-a11y="fontScale" data-val="1">A</button>
+                <button class="seg-btn" data-a11y="fontScale" data-val="1.15">A+</button>
+                <button class="seg-btn" data-a11y="fontScale" data-val="1.4">A++</button>
+              </div>
+            </div>
+            <p style="font-size:.84rem;color:var(--text-muted);margin:14px 0 0;">Compatível com leitores de tela (NVDA, JAWS, VoiceOver, TalkBack): landmarks, rótulos em todos os botões, foco visível e anúncios automáticos ao trocar de página. O site também funciona 100% pelo teclado — use Tab, Enter e as setas.</p>
+          </div>
+        </div>
+
+        <!-- SETTINGS -->
+        <div class="view" id="view-settings" hidden>
+          <div class="view-head"><div><h1>Configurações</h1><p>Personalize sua conta e sua experiência.</p></div></div>
+          <div class="settings-grid">
+            <div class="settings-tabs" role="tablist" aria-label="Categorias de configuração">
+              <button class="active" data-tab="profile" role="tab" aria-selected="true">Perfil</button>
+              <button data-tab="access" role="tab" aria-selected="false">Acessibilidade</button>
+              <button data-tab="prefs" role="tab" aria-selected="false">Preferências</button>
+              <button data-tab="account" role="tab" aria-selected="false">Conta</button>
+            </div>
+            <div>
+              <div class="card settings-panel" id="tab-profile">
+                <h3 style="margin-bottom:16px;">Perfil</h3>
+                <div class="avatar-upload" style="margin-bottom:22px;">
+                  <span class="avatar-lg" id="settings-avatar">C</span>
+                  <div>
+                    <input type="file" id="avatar-input" accept="image/*" class="visually-hidden">
+                    <button class="btn btn-secondary btn-sm" id="avatar-btn">Alterar foto</button>
+                  </div>
+                </div>
+                <div class="field"><label for="settings-name">Nome</label><input type="text" id="settings-name"></div>
+                <div class="field"><label for="settings-email">E-mail</label><input type="email" id="settings-email" disabled></div>
+                <button class="btn btn-primary" id="save-profile">Salvar alterações</button>
+              </div>
+              <div class="card settings-panel" id="tab-access" hidden>
+                <h3 style="margin-bottom:6px;">Acessibilidade</h3>
+                <p style="color:var(--text-muted);margin-bottom:10px;">As mesmas opções do painel rápido de acessibilidade, disponíveis aqui também.</p>
+                <div id="settings-a11y-mount"></div>
+              </div>
+              <div class="card settings-panel" id="tab-prefs" hidden>
+                <h3 style="margin-bottom:16px;">Preferências</h3>
+                <div class="setting-row"><div class="desc"><b>Idioma</b><span>Idioma da interface</span></div>
+                  <select id="pref-lang" style="width:160px;padding:8px;border-radius:8px;border:1.5px solid var(--border);background:var(--bg-elevated);color:var(--text);">
+                    <option value="pt-BR">Português (Brasil)</option>
+                    <option value="en">English (em breve)</option>
+                    <option value="es">Español (em breve)</option>
+                  </select>
+                </div>
+                <div class="setting-row"><div class="desc"><b>Notificações de lembretes</b><span>Avisos visuais para tarefas da agenda</span></div>
+                  <label class="switch"><input type="checkbox" id="pref-notify" checked><span class="track"></span><span class="thumb"></span></label>
+                </div>
+                <div class="setting-row"><div class="desc"><b>Som de interface</b><span>Sons discretos de confirmação</span></div>
+                  <label class="switch"><input type="checkbox" id="pref-sound"><span class="track"></span><span class="thumb"></span></label>
+                </div>
+              </div>
+              <div class="card settings-panel" id="tab-account" hidden>
+                <h3 style="margin-bottom:16px;">Conta</h3>
+                <div class="field"><label for="settings-password">Nova senha</label><input type="password" id="settings-password" placeholder="Deixe em branco para não alterar"></div>
+                <button class="btn btn-secondary" id="save-password" style="margin-bottom:24px;">Atualizar senha</button>
+                <div style="border-top:1px solid var(--border);padding-top:20px;">
+                  <button class="btn btn-secondary" id="clear-progress" style="color:var(--danger);border-color:var(--danger-soft);">Apagar meu progresso</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </main>
+    </div>
+  </div>
+
+  <nav class="mobile-tabbar" aria-label="Navegação móvel">
+    <button data-view="dashboard" class="active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 11.5 12 4l8 7.5"/><path d="M6 10v8.5a1 1 0 0 0 1 1h3.5v-5.5h3v5.5H17a1 1 0 0 0 1-1V10"/></svg>Painel</button>
+    <button data-view="activities"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 4.5a2.5 2.5 0 0 0-2.5 2.5v.3A2.7 2.7 0 0 0 5 9.8v1.4a2.7 2.7 0 0 0 1 2.1v1.2A2.5 2.5 0 0 0 8.5 17H9"/><path d="M15 4.5a2.5 2.5 0 0 1 2.5 2.5v.3A2.7 2.7 0 0 1 19 9.8v1.4a2.7 2.7 0 0 1-1 2.1v1.2A2.5 2.5 0 0 1 15.5 17H15"/><path d="M9 4.5V18a1.5 1.5 0 0 0 3 0V6a1.5 1.5 0 0 1 3-.5"/></svg>Atividades</button>
+    <button data-view="games"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="8" width="18" height="9" rx="3"/><path d="M8 12h-2m1-1v2"/><circle cx="16" cy="11.5" r=".6" fill="currentColor"/><circle cx="18" cy="13.5" r=".6" fill="currentColor"/></svg>Jogos</button>
+    <button data-view="agenda"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15" rx="2.2"/><path d="M8 3v4M16 3v4M3.5 10h17"/></svg>Agenda</button>
+    <button data-view="settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h9M17 6h3M4 12h3M9 12h11M4 18h13M19 18h1"/><circle cx="15" cy="6" r="2"/><circle cx="7" cy="12" r="2"/><circle cx="17" cy="18" r="2"/></svg>Ajustes</button>
+  </nav>
+</section>
+
+<!-- ============ ACCESSIBILITY PANEL (global) ============ -->
+<div class="a11y-overlay" id="a11y-overlay"></div>
+<!-- VLibras (tradução automática para Libras) — injetado dinamicamente quando ativado -->
+<div id="vlibras-container" vw class="enabled" hidden>
+  <div vw-access-button class="active"></div>
+  <div vw-plugin-wrapper><div class="vw-plugin-top-wrapper"></div></div>
+</div>
+
+<aside class="a11y-panel" id="a11y-panel" role="dialog" aria-label="Painel de acessibilidade" aria-modal="true">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;">
+    <h2 style="margin:0;">Acessibilidade</h2>
+    <button class="icon-btn" id="btn-close-a11y" aria-label="Fechar painel de acessibilidade"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+  </div>
+  <div id="a11y-controls-mount"></div>
+</aside>
+
+<template id="tpl-a11y-controls">
+  <div class="a11y-group">
+    <span class="a11y-group-label">Tamanho da fonte</span>
+    <div class="seg-row">
+      <button class="seg-btn" data-a11y="fontScale" data-val="0.9">A-</button>
+      <button class="seg-btn" data-a11y="fontScale" data-val="1">A</button>
+      <button class="seg-btn" data-a11y="fontScale" data-val="1.15">A+</button>
+      <button class="seg-btn" data-a11y="fontScale" data-val="1.3">A++</button>
+    </div>
+  </div>
+  <div class="a11y-group">
+    <span class="a11y-group-label">Espaçamento entre linhas</span>
+    <div class="seg-row">
+      <button class="seg-btn" data-a11y="lineHeight" data-val="1.4">Compacto</button>
+      <button class="seg-btn" data-a11y="lineHeight" data-val="1.6">Padrão</button>
+      <button class="seg-btn" data-a11y="lineHeight" data-val="2">Amplo</button>
+    </div>
+  </div>
+  <div class="a11y-group">
+    <span class="a11y-group-label">Fonte de leitura facilitada</span>
+    <div class="seg-row">
+      <button class="seg-btn" data-a11y="fontFamily" data-val="atkinson">Padrão</button>
+      <button class="seg-btn" data-a11y="fontFamily" data-val="lexend">Lexend</button>
+    </div>
+  </div>
+  <div class="a11y-group">
+    <div class="setting-row" style="padding:0;border:none;">
+      <div class="desc"><b>Alto contraste</b><span>Aumenta o contraste de cores</span></div>
+      <label class="switch"><input type="checkbox" data-a11y-toggle="contrast"><span class="track"></span><span class="thumb"></span></label>
+    </div>
+  </div>
+  <div class="a11y-group">
+    <div class="setting-row" style="padding:0;border:none;">
+      <div class="desc"><b>Modo escuro</b><span>Reduz o brilho geral da tela</span></div>
+      <label class="switch"><input type="checkbox" data-a11y-toggle="dark"><span class="track"></span><span class="thumb"></span></label>
+    </div>
+  </div>
+  <div class="a11y-group">
+    <div class="setting-row" style="padding:0;border:none;">
+      <div class="desc"><b>Reduzir animações</b><span>Diminui movimento na interface</span></div>
+      <label class="switch"><input type="checkbox" data-a11y-toggle="reduceMotion"><span class="track"></span><span class="thumb"></span></label>
+    </div>
+  </div>
+  <div class="a11y-group">
+    <span class="a11y-group-label">Brilho da interface</span>
+    <div class="range-row"><input type="range" min="70" max="115" data-a11y-range="brightness"></div>
+  </div>
+  <div class="a11y-group">
+    <span class="a11y-group-label">Leitura por voz</span>
+    <button class="btn btn-secondary btn-block btn-sm" id="a11y-tts-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9.5v5h3.5L13 19V5L7.5 9.5Z"/><path d="M17 9a4 4 0 0 1 0 6"/><path d="M19.5 6.5a8 8 0 0 1 0 11"/></svg> Ouvir esta página</button>
+  </div>
+  <div class="a11y-group" style="border-top:1px solid var(--border);padding-top:18px;">
+    <span class="a11y-group-label">Surdez e deficiência auditiva</span>
+    <div class="setting-row" style="padding:0 0 10px;border:none;">
+      <div class="desc"><b>Tradução em Libras (VLibras)</b><span>Avatar tradutor de Português para Libras em toda a página</span></div>
+      <label class="switch"><input type="checkbox" data-a11y-toggle="vlibras"><span class="track"></span><span class="thumb"></span></label>
+    </div>
+    <div class="setting-row" style="padding:0;border:none;">
+      <div class="desc"><b>Legendas de áudio</b><span>Mostra em texto o que está tocando em sons e músicas</span></div>
+      <label class="switch"><input type="checkbox" data-a11y-toggle="captions"><span class="track"></span><span class="thumb"></span></label>
+    </div>
+  </div>
+  <div class="a11y-group">
+    <span class="a11y-group-label">Baixa visão e cegueira</span>
+    <div class="setting-row" style="padding:0 0 10px;border:none;">
+      <div class="desc"><b>Descrição de áudio</b><span>Revela em texto a descrição de ilustrações e imagens</span></div>
+      <label class="switch"><input type="checkbox" data-a11y-toggle="audioDesc"><span class="track"></span><span class="thumb"></span></label>
+    </div>
+    <p style="font-size:.8rem;color:var(--text-muted);margin:6px 0 0;">Todo o site é compatível com leitores de tela (NVDA, JAWS, VoiceOver, TalkBack): landmarks, foco visível, rótulos em botões e regiões de anúncio ao vivo.</p>
+  </div>
+</template>
+<script>
+const ICONS = {"home": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M4 11.5 12 4l8 7.5\"/><path d=\"M6 10v8.5a1 1 0 0 0 1 1h3.5v-5.5h3v5.5H17a1 1 0 0 0 1-1V10\"/></svg>", "brain": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M9 4.5a2.5 2.5 0 0 0-2.5 2.5v.3A2.7 2.7 0 0 0 5 9.8v1.4a2.7 2.7 0 0 0 1 2.1v1.2A2.5 2.5 0 0 0 8.5 17H9\"/><path d=\"M15 4.5a2.5 2.5 0 0 1 2.5 2.5v.3A2.7 2.7 0 0 1 19 9.8v1.4a2.7 2.7 0 0 1-1 2.1v1.2A2.5 2.5 0 0 1 15.5 17H15\"/><path d=\"M9 4.5V18a1.5 1.5 0 0 0 3 0V6a1.5 1.5 0 0 1 3-.5\"/></svg>", "game": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><rect x=\"3\" y=\"8\" width=\"18\" height=\"9\" rx=\"3\"/><path d=\"M8 12h-2m1-1v2\"/><circle cx=\"16\" cy=\"11.5\" r=\".6\" fill=\"currentColor\"/><circle cx=\"18\" cy=\"13.5\" r=\".6\" fill=\"currentColor\"/></svg>", "chat": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M4 5.5A1.5 1.5 0 0 1 5.5 4h13A1.5 1.5 0 0 1 20 5.5v9A1.5 1.5 0 0 1 18.5 16H10l-4.5 4v-4H5.5A1.5 1.5 0 0 1 4 14.5z\"/></svg>", "leaf": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M19 5c-8 0-13 4-13 12 8 0 13-4 13-12Z\"/><path d=\"M6.5 17.5 15 9\"/></svg>", "calendar": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><rect x=\"3.5\" y=\"5\" width=\"17\" height=\"15\" rx=\"2.2\"/><path d=\"M8 3v4M16 3v4M3.5 10h17\"/></svg>", "book": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M4 5.5A2 2 0 0 1 6 3.5h5V19H6a2 2 0 0 0-2 2Z\"/><path d=\"M20 5.5A2 2 0 0 0 18 3.5h-5V19h5a2 2 0 0 1 2 2Z\"/></svg>", "chart": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M4 20V10M10 20V4M16 20v-7M22 20H2\"/></svg>", "sliders": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M4 6h9M17 6h3M4 12h3M9 12h11M4 18h13M19 18h1\"/><circle cx=\"15\" cy=\"6\" r=\"2\"/><circle cx=\"7\" cy=\"12\" r=\"2\"/><circle cx=\"17\" cy=\"18\" r=\"2\"/></svg>", "logout": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M9 4H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h3\"/><path d=\"M15 8l4 4-4 4M9 12h10\"/></svg>", "search": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><circle cx=\"10.5\" cy=\"10.5\" r=\"6.5\"/><path d=\"M20 20l-4.5-4.5\"/></svg>", "volume": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M4 9.5v5h3.5L13 19V5L7.5 9.5Z\"/><path d=\"M17 9a4 4 0 0 1 0 6\"/><path d=\"M19.5 6.5a8 8 0 0 1 0 11\"/></svg>", "moon": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M20 14.5A8.5 8.5 0 1 1 9.5 4a7 7 0 0 0 10.5 10.5Z\"/></svg>", "sun": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><circle cx=\"12\" cy=\"12\" r=\"4.2\"/><path d=\"M12 3v2.2M12 18.8V21M4.9 4.9l1.5 1.5M17.6 17.6l1.5 1.5M3 12h2.2M18.8 12H21M4.9 19.1l1.5-1.5M17.6 6.4l1.5-1.5\"/></svg>", "close": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M6 6l12 12M18 6 6 18\"/></svg>", "arrowleft": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M19 12H5M11 6l-6 6 6 6\"/></svg>", "send": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M4.5 11.5 19 4 12 19l-2.4-6.1Z\"/><path d=\"M9.6 12.9 19 4\"/></svg>", "plus": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M12 5v14M5 12h14\"/></svg>", "check": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M4.5 12.5 9 17l10.5-11\"/></svg>", "trash": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M5 7h14M9.5 7V5a1 1 0 0 1 1-1h3a1 1 0 0 1 1 1v2M7 7l1 12.5A1.5 1.5 0 0 0 9.5 21h5a1.5 1.5 0 0 0 1.5-1.5L17 7\"/></svg>", "target": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><circle cx=\"12\" cy=\"12\" r=\"8\"/><circle cx=\"12\" cy=\"12\" r=\"4\"/><circle cx=\"12\" cy=\"12\" r=\".7\" fill=\"currentColor\"/></svg>", "eye": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12Z\"/><circle cx=\"12\" cy=\"12\" r=\"3\"/></svg>", "shuffle": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M3 7h3.5L15 17.5H21M15 6.5h6M18 4l3 2.5-3 2.5M3 17h3.5L11 12M18 20l3-2.5-3-2.5\"/></svg>", "grid": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><rect x=\"3.5\" y=\"3.5\" width=\"7\" height=\"7\" rx=\"1.2\"/><rect x=\"13.5\" y=\"3.5\" width=\"7\" height=\"7\" rx=\"1.2\"/><rect x=\"3.5\" y=\"13.5\" width=\"7\" height=\"7\" rx=\"1.2\"/><rect x=\"13.5\" y=\"13.5\" width=\"7\" height=\"7\" rx=\"1.2\"/></svg>", "compass": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><circle cx=\"12\" cy=\"12\" r=\"8.5\"/><path d=\"m15 9-4.5 1.5L9 15l4.5-1.5Z\"/></svg>", "faceSmile": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><circle cx=\"12\" cy=\"12\" r=\"8.5\"/><path d=\"M8.5 14.5c.9 1.2 2.1 1.8 3.5 1.8s2.6-.6 3.5-1.8\"/><path d=\"M8.7 9.8h.01M15.3 9.8h.01\"/></svg>", "palette": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M12 3.5a8.5 8.5 0 1 0 0 17c1 0 1.7-.8 1.7-1.7 0-.5-.2-.9-.5-1.2-.3-.3-.5-.7-.5-1.1 0-.9.7-1.6 1.6-1.6H16a4 4 0 0 0 4-4c0-4-3.6-7.4-8-7.4Z\"/><circle cx=\"7.5\" cy=\"11\" r=\"1\" fill=\"currentColor\"/><circle cx=\"9.5\" cy=\"7.5\" r=\"1\" fill=\"currentColor\"/><circle cx=\"14.5\" cy=\"7.5\" r=\"1\" fill=\"currentColor\"/></svg>", "ear": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M8 13.5c0 3 2 5.5 4.5 5.5S16 17 16 14.5 14.3 10 12 10s-3 1.5-3 3 1 2.2 2 2.2\"/><path d=\"M8 13.5c-2 0-3.5-1.8-3.5-4.5A6.5 6.5 0 0 1 11 2.5c4 0 6.5 3 6.5 7\"/></svg>", "puzzle": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M9 4h4v2.2a1.6 1.6 0 0 0 2.8 1.1A1.6 1.6 0 0 1 18.5 9H20v4h-2.2a1.6 1.6 0 0 0 0 3.2H20v4h-4v-2.2a1.6 1.6 0 0 0-3.2 0V20H9v-2h-2a1.6 1.6 0 0 1-1.6-2.8A1.6 1.6 0 0 0 4 13.5V11h2a1.6 1.6 0 0 0 0-3.2H4V4h5Z\"/></svg>", "layers": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M12 3.5 21 8l-9 4.5L3 8Z\"/><path d=\"M3 12.5 12 17l9-4.5M3 16.5 12 21l9-4.5\"/></svg>", "zap": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M13 3 5 13.5h5.5L11 21l8-11h-5.5Z\"/></svg>", "bell": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M6 10a6 6 0 0 1 12 0c0 4.5 1.5 6 1.5 6h-15S6 14.5 6 10Z\"/><path d=\"M9.5 19a2.5 2.5 0 0 0 5 0\"/></svg>", "user": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><circle cx=\"12\" cy=\"8.5\" r=\"3.5\"/><path d=\"M4.5 20a7.5 7.5 0 0 1 15 0\"/></svg>", "lock": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><rect x=\"5\" y=\"10.5\" width=\"14\" height=\"9\" rx=\"2\"/><path d=\"M8 10.5V8a4 4 0 0 1 8 0v2.5\"/></svg>", "star": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M12 3.5 14.4 9l6 .6-4.5 4 1.4 5.9L12 16.5 6.7 19.5l1.4-5.9-4.5-4 6-.6Z\"/></svg>", "flag": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M6 21V4\"/><path d=\"M6 5h12l-3 4 3 4H6\"/></svg>", "clock": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><circle cx=\"12\" cy=\"12\" r=\"8.5\"/><path d=\"M12 7.5V12l3 2\"/></svg>", "sparkle": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M12 3v4M12 17v4M3 12h4M17 12h4M6 6l2.5 2.5M15.5 15.5 18 18M18 6l-2.5 2.5M8.5 15.5 6 18\"/></svg>", "headphones": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M4 14v-2a8 8 0 0 1 16 0v2\"/><rect x=\"3.2\" y=\"14\" width=\"4.3\" height=\"6\" rx=\"1.5\"/><rect x=\"16.5\" y=\"14\" width=\"4.3\" height=\"6\" rx=\"1.5\"/></svg>"};
+/* ===================================================================
+   CLAREZA — application logic
+   NOTE: This is a front-end prototype. It uses the artifact key-value
+   storage (window.storage) as a stand-in "database" so that accounts,
+   progress and settings persist between visits. Passwords are only
+   lightly obfuscated (NOT cryptographically hashed) — a real backend
+   would use bcrypt/argon2 over HTTPS, as described in the write-up
+   accompanying this prototype.
+   =================================================================== */
+(function(){
+"use strict";
+
+/* ---------------- storage helpers ---------------- */
+async function stGet(key){
+  try{ const r = await window.storage.get(key,false); return r ? JSON.parse(r.value) : null; }
+  catch(e){ return null; }
+}
+async function stSet(key,val){
+  try{ await window.storage.set(key, JSON.stringify(val), false); return true; }
+  catch(e){ console.error('storage set failed',e); return false; }
+}
+async function stDel(key){ try{ await window.storage.delete(key,false); }catch(e){} }
+
+function simpleObfuscate(str){ try{ return btoa(unescape(encodeURIComponent(str))).split('').reverse().join(''); }catch(e){ return str; } }
+
+function toast(msg){
+  const region = document.getElementById('toast-region');
+  const el = document.createElement('div');
+  el.className='toast'; el.textContent = msg;
+  region.appendChild(el);
+  setTimeout(()=>{ el.style.opacity='0'; el.style.transition='opacity .3s'; setTimeout(()=>el.remove(),320); }, 3200);
+  if(state.settings && state.settings.visualAlerts){
+    const flash = document.getElementById('visual-alert-flash');
+    if(flash){ flash.classList.remove('flash'); void flash.offsetWidth; flash.classList.add('flash'); }
+  }
+}
+
+function uid(){ return 'id'+Date.now().toString(36)+Math.random().toString(36).slice(2,7); }
+function escapeHTML(s){ return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function todayISO(){ const d=new Date(); return d.toISOString().slice(0,10); }
+function fmtDate(iso){ if(!iso) return ''; const [y,m,d]=iso.split('-'); return `${d}/${m}/${y}`; }
+
+/* ---------------- app state ---------------- */
+const state = {
+  user:null,          // {name,email,avatar}
+  settings:null,       // accessibility + prefs
+  progress:null,        // activity/game history
+  agenda:[],
+  currentView:'dashboard',
+  currentPlayer:null,   // {type,id}
+  ttsUtterance:null,
+  breathTimer:null,
+  pauseTimer:null,
+  audioCtx:null,
+  activeSounds:{}
+};
+
+const DEFAULT_SETTINGS = {
+  fontScale:1, lineHeight:1.6, fontFamily:'atkinson',
+  contrast:false, dark:false, reduceMotion:false, brightness:100,
+  lang:'pt-BR', notify:true, uiSound:false,
+  vlibras:false, captions:true, audioDesc:false, visualAlerts:false
+};
+
+/* ---------------- screen / view routing ---------------- */
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById('screen-'+id).classList.add('active');
+  window.scrollTo(0,0);
+  clearFormMessages();
+}
+function clearFormMessages(){
+  document.querySelectorAll('.form-error,.form-success').forEach(el=>{el.style.display='none';el.textContent='';});
+}
+function showView(view){
+  state.currentView = view;
+  document.querySelectorAll('.view').forEach(v=>v.hidden = true);
+  const target = document.getElementById('view-'+view);
+  if(target) target.hidden = false;
+  document.querySelectorAll('.side-link[data-view]').forEach(b=>b.classList.toggle('active', b.dataset.view===view));
+  document.querySelectorAll('.mobile-tabbar button[data-view]').forEach(b=>b.classList.toggle('active', b.dataset.view===view));
+  document.getElementById('main-content').scrollTo?.(0,0);
+  window.scrollTo(0,0);
+  renderView(view);
+}
+function renderView(view){
+  if(view==='dashboard') renderDashboard();
+  else if(view==='activities') renderCatalog('activity');
+  else if(view==='games') renderCatalog('game');
+  else if(view==='chat') initChat();
+  else if(view==='relax') renderRelax();
+  else if(view==='agenda') renderAgenda();
+  else if(view==='learn') renderLearn();
+  else if(view==='stats') renderStats();
+  else if(view==='accessibility') renderAccessibilityHub();
+  else if(view==='settings') renderSettings();
+  announceRoute(view);
+}
+const VIEW_NAMES = {dashboard:'Painel',activities:'Atividades',games:'Jogos',player:'Atividade em andamento',chat:'Chat de apoio',relax:'Área de relaxamento',agenda:'Agenda',learn:'Aprendizado',article:'Artigo',stats:'Estatísticas',accessibility:'Acessibilidade',settings:'Configurações'};
+function announceRoute(view){
+  const el = document.getElementById('route-announcer');
+  if(el) el.textContent = 'Página: ' + (VIEW_NAMES[view]||view);
+}
+
+/* ---------------- auth ---------------- */
+async function getUsers(){ return (await stGet('auth:users')) || []; }
+async function saveUsers(list){ return stSet('auth:users', list); }
+
+async function handleSignup(name,email,pass){
+  email = email.trim().toLowerCase();
+  const users = await getUsers();
+  if(users.find(u=>u.email===email)) return {error:'Já existe uma conta com este e-mail.'};
+  const user = {name:name.trim(), email, pass:simpleObfuscate(pass), avatar:null, createdAt:Date.now()};
+  users.push(user);
+  await saveUsers(users);
+  await stSet('progress:'+email, {activities:{}, games:{}, totalMinutes:0, sessions:[], streak:0, lastActive:todayISO()});
+  await stSet('agenda:'+email, []);
+  await stSet('settings:'+email, DEFAULT_SETTINGS);
+  return {ok:true, user};
+}
+async function handleLogin(email,pass,keep){
+  email = email.trim().toLowerCase();
+  const users = await getUsers();
+  const u = users.find(x=>x.email===email);
+  if(!u || u.pass !== simpleObfuscate(pass)) return {error:'E-mail ou senha incorretos.'};
+  await stSet('auth:session', {email, keep});
+  return {ok:true, user:u};
+}
+async function handleForgot(email){
+  email = email.trim().toLowerCase();
+  const users = await getUsers();
+  const u = users.find(x=>x.email===email);
+  if(!u) return {error:'Não encontramos uma conta com este e-mail.'};
+  return {ok:true};
+}
+async function logout(){
+  await stDel('auth:session');
+  state.user=null; state.settings=null; state.progress=null; state.agenda=[];
+  stopAllSounds(); stopBreath();
+  showScreen('landing');
+}
+
+async function bootSession(){
+  const session = await stGet('auth:session');
+  if(!session) { showScreen('landing'); return; }
+  const users = await getUsers();
+  const u = users.find(x=>x.email===session.email);
+  if(!u){ showScreen('landing'); return; }
+  await enterApp(u);
+}
+
+async function enterApp(user){
+  state.user = user;
+  state.settings = (await stGet('settings:'+user.email)) || {...DEFAULT_SETTINGS};
+  state.progress = (await stGet('progress:'+user.email)) || {activities:{}, games:{}, totalMinutes:0, sessions:[], streak:0, lastActive:todayISO()};
+  state.agenda = (await stGet('agenda:'+user.email)) || [];
+  applySettings(state.settings);
+  updateHeaderIdentity();
+  showScreen('app');
+  showView('dashboard');
+}
+
+function updateHeaderIdentity(){
+  const initial = (state.user.name||'?').trim().charAt(0).toUpperCase()||'?';
+  const av1 = document.getElementById('topbar-avatar');
+  const av2 = document.getElementById('settings-avatar');
+  [av1,av2].forEach(el=>{
+    if(!el) return;
+    if(state.user.avatar){ el.innerHTML = `<img src="${state.user.avatar}" alt="">`; }
+    else { el.textContent = initial; }
+  });
+}
+
+/* ---------------- accessibility ---------------- */
+function applySettings(s){
+  const root = document.documentElement;
+  root.style.setProperty('--font-scale', s.fontScale);
+  root.style.setProperty('--line-height', s.lineHeight);
+  root.style.setProperty('--brightness', (s.brightness/100));
+  root.style.setProperty('--font-body', s.fontFamily==='lexend' ? "'Lexend', sans-serif" : "'Atkinson Hyperlegible', sans-serif");
+  root.setAttribute('data-theme', s.dark ? 'dark':'light');
+  root.setAttribute('data-contrast', s.contrast ? 'high':'normal');
+  document.body.classList.toggle('reduce-motion', !!s.reduceMotion);
+  document.body.classList.toggle('audio-desc-on', !!s.audioDesc);
+  document.body.classList.toggle('captions-on', s.captions!==false);
+  const themeIcon = document.getElementById('btn-theme');
+  if(themeIcon) themeIcon.innerHTML = s.dark ? ICONS.sun : ICONS.moon;
+  if(s.vlibras) enableVLibras(); else disableVLibras();
+  syncA11yControls(s);
+}
+function syncA11yControls(s){
+  document.querySelectorAll('[data-a11y="fontScale"]').forEach(b=>b.classList.toggle('active', parseFloat(b.dataset.val)===s.fontScale));
+  document.querySelectorAll('[data-a11y="lineHeight"]').forEach(b=>b.classList.toggle('active', parseFloat(b.dataset.val)===s.lineHeight));
+  document.querySelectorAll('[data-a11y="fontFamily"]').forEach(b=>b.classList.toggle('active', b.dataset.val===s.fontFamily));
+  document.querySelectorAll('[data-a11y-toggle="contrast"]').forEach(el=>el.checked = !!s.contrast);
+  document.querySelectorAll('[data-a11y-toggle="dark"]').forEach(el=>el.checked = !!s.dark);
+  document.querySelectorAll('[data-a11y-toggle="reduceMotion"]').forEach(el=>el.checked = !!s.reduceMotion);
+  document.querySelectorAll('[data-a11y-toggle="vlibras"]').forEach(el=>el.checked = !!s.vlibras);
+  document.querySelectorAll('[data-a11y-toggle="captions"]').forEach(el=>el.checked = s.captions!==false);
+  document.querySelectorAll('[data-a11y-toggle="audioDesc"]').forEach(el=>el.checked = !!s.audioDesc);
+  document.querySelectorAll('[data-a11y-toggle="visualAlerts"]').forEach(el=>el.checked = !!s.visualAlerts);
+  document.querySelectorAll('[data-a11y-range="brightness"]').forEach(el=>el.value = s.brightness);
+}
+async function updateSetting(key,val){
+  state.settings[key]=val;
+  applySettings(state.settings);
+  if(state.user) await stSet('settings:'+state.user.email, state.settings);
+}
+
+function mountA11yControls(container){
+  const tpl = document.getElementById('tpl-a11y-controls');
+  container.innerHTML='';
+  container.appendChild(tpl.content.cloneNode(true));
+  wireA11yContainer(container);
+  const ttsBtn = container.querySelector('#a11y-tts-btn');
+  if(ttsBtn) ttsBtn.addEventListener('click', readCurrentView);
+  syncA11yControls(state.settings || DEFAULT_SETTINGS);
+}
+function wireA11yContainer(container){
+  container.querySelectorAll('[data-a11y]').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const key = btn.dataset.a11y;
+      const val = key==='fontFamily' ? btn.dataset.val : parseFloat(btn.dataset.val);
+      updateSetting(key,val);
+    });
+  });
+  container.querySelectorAll('[data-a11y-toggle]').forEach(inp=>{
+    inp.addEventListener('change', ()=> updateSetting(inp.dataset.a11yToggle, inp.checked));
+  });
+  container.querySelectorAll('[data-a11y-range]').forEach(inp=>{
+    inp.addEventListener('input', ()=> updateSetting(inp.dataset.a11yRange, parseInt(inp.value,10)));
+  });
+}
+function renderAccessibilityHub(){
+  const view = document.getElementById('view-accessibility');
+  if(!view.dataset.wired){
+    view.dataset.wired='1';
+    wireA11yContainer(view);
+    const ttsBtn = document.getElementById('hub-tts-btn');
+    if(ttsBtn) ttsBtn.addEventListener('click', readCurrentView);
+  }
+  syncA11yControls(state.settings || DEFAULT_SETTINGS);
+}
+
+function openA11yPanel(){
+  document.getElementById('a11y-panel').classList.add('active');
+  document.getElementById('a11y-overlay').classList.add('active');
+  mountA11yControls(document.getElementById('a11y-controls-mount'));
+  document.getElementById('btn-close-a11y').focus();
+}
+function closeA11yPanel(){
+  document.getElementById('a11y-panel').classList.remove('active');
+  document.getElementById('a11y-overlay').classList.remove('active');
+  document.getElementById('btn-open-a11y').focus();
+}
+
+/* ---------------- VLibras (Libras sign-language avatar) ----------------
+   Uses the official public VLibras widget (vlibras.gov.br). This requires
+   the page to reach an external service, so it only works once the site
+   is deployed on a real domain with outbound network access — it may not
+   load inside a sandboxed preview. We fail gracefully and explain why. */
+let vlibrasState = 'idle'; // idle | loading | ready | failed
+function enableVLibras(){
+  const box = document.getElementById('vlibras-container');
+  box.hidden = false;
+  if(vlibrasState==='ready' || vlibrasState==='loading') return;
+  vlibrasState='loading';
+  const existing = document.getElementById('vlibras-script');
+  if(existing){ tryInitVLibras(); return; }
+  const script = document.createElement('script');
+  script.id='vlibras-script';
+  script.src='https://vlibras.gov.br/app/vlibras-plugin.js';
+  script.onload = tryInitVLibras;
+  script.onerror = ()=>{ vlibrasState='failed'; vlibrasFallback(); };
+  document.body.appendChild(script);
+  trackTimer(setTimeout(()=>{ if(vlibrasState==='loading'){ vlibrasState='failed'; vlibrasFallback(); } }, 4500));
+}
+function tryInitVLibras(){
+  try{
+    if(window.VLibras){ new window.VLibras.Widget('https://vlibras.gov.br/app'); vlibrasState='ready'; toast('VLibras ativado — procure o ícone de acessibilidade no canto da tela.'); }
+    else { vlibrasState='failed'; vlibrasFallback(); }
+  }catch(e){ vlibrasState='failed'; vlibrasFallback(); }
+}
+function vlibrasFallback(){
+  toast('Não foi possível carregar o VLibras agora. Em um site publicado (com acesso a vlibras.gov.br), o avatar de Libras aparece automaticamente ao ativar esta opção.');
+}
+function disableVLibras(){
+  const box = document.getElementById('vlibras-container');
+  if(box) box.hidden = true;
+}
+
+/* ---------------- text-to-speech ---------------- */
+function readCurrentView(){
+  if(!('speechSynthesis' in window)){ toast('Leitura por voz não é compatível com este navegador.'); return; }
+  window.speechSynthesis.cancel();
+  const activeScreen = document.querySelector('.screen.active');
+  let scope = activeScreen && activeScreen.id==='screen-app'
+    ? document.querySelector('#main-content .view:not([hidden])')
+    : activeScreen;
+  if(!scope) return;
+  const text = scope.innerText.replace(/\s+/g,' ').trim().slice(0,3000);
+  if(!text){ toast('Nada para ler nesta página.'); return; }
+  const utt = new SpeechSynthesisUtterance(text);
+  utt.lang='pt-BR'; utt.rate=0.98;
+  window.speechSynthesis.speak(utt);
+  toast('Lendo conteúdo da página...');
+}
+document.addEventListener('keydown', e=>{
+  if(e.key==='Escape') window.speechSynthesis && window.speechSynthesis.cancel();
+});
+
+/* ---------------- catalog data ---------------- */
+const CATEGORIES = {
+  attention:'Atenção', memory:'Memória', logic:'Raciocínio lógico', reading:'Leitura',
+  emotion:'Emoções', visual:'Coordenação visual', organization:'Organização', sound:'Sons'
+};
+
+const CATALOG = [
+  // ---- ATIVIDADES ----
+  {id:'assoc-imagens', type:'activity', title:'Associação de Imagens', category:'memory',
+   desc:'Encontre os pares de itens que pertencem ao mesmo grupo.', icon:'grid', engine:'match',
+   config:{groups:[
+     {pairs:[['Maçã','Fruta'],['Cadeira','Móvel'],['Cachorro','Animal'],['Guarda-chuva','Objeto de chuva']]},
+     {pairs:[['Sol','Dia'],['Lua','Noite'],['Livro','Leitura'],['Relógio','Tempo'],['Chave','Porta'],['Sapato','Pé']]},
+     {pairs:[['Violão','Música'],['Pincel','Pintura'],['Bola','Esporte'],['Lápis','Escrita'],['Panela','Cozinha'],['Mapa','Viagem'],['Semente','Planta']]}
+   ]}},
+  {id:'memoria-atividade', type:'activity', title:'Memória de Palavras', category:'memory',
+   desc:'Vire as cartas e encontre os pares de palavras iguais.', icon:'layers', engine:'memory',
+   config:{sets:[
+     ['Calma','Foco','Luz','Paz'],
+     ['Calma','Foco','Luz','Paz','Água','Verde'],
+     ['Calma','Foco','Luz','Paz','Água','Verde','Tempo','Ideia']
+   ]}},
+  {id:'emocoes', type:'activity', title:'Identificação de Emoções', category:'emotion',
+   desc:'Observe a ilustração e identifique a emoção representada.', icon:'faceSmile', engine:'choice',
+   config:{rounds:[
+     {face:'happy', question:'Que emoção esta expressão representa?', options:['Alegria','Raiva','Tristeza','Medo'], answer:0},
+     {face:'sad', question:'Que emoção esta expressão representa?', options:['Surpresa','Tristeza','Alegria','Calma'], answer:1},
+     {face:'angry', question:'Que emoção esta expressão representa?', options:['Raiva','Alegria','Cansaço','Surpresa'], answer:0},
+     {face:'surprised', question:'Que emoção esta expressão representa?', options:['Tédio','Tristeza','Surpresa','Raiva'], answer:2},
+     {face:'calm', question:'Que emoção esta expressão representa?', options:['Calma','Raiva','Medo','Surpresa'], answer:0},
+     {face:'scared', question:'Que emoção esta expressão representa?', options:['Alegria','Medo','Calma','Tédio'], answer:1}
+   ]}},
+  {id:'sequencia-logica', type:'activity', title:'Sequência Lógica', category:'logic',
+   desc:'Descubra qual elemento continua a sequência.', icon:'shuffle', engine:'choice',
+   config:{rounds:[
+     {question:'2, 4, 6, 8, ...', options:['9','10','12','7'], answer:1},
+     {question:'A, C, E, G, ...', options:['H','I','J','F'], answer:1},
+     {question:'●, ●●, ●●●, ...', options:['●●●●','●●','●','●●●●●'], answer:0},
+     {question:'1, 2, 4, 8, ...', options:['10','12','16','14'], answer:2},
+     {question:'Segunda, Terça, Quarta, ...', options:['Sábado','Quinta','Domingo','Sexta'], answer:1},
+     {question:'3, 6, 9, 12, ...', options:['14','15','16','13'], answer:1}
+   ]}},
+  {id:'organizacao-objetos', type:'activity', title:'Organização de Objetos', category:'organization',
+   desc:'Arraste cada item para a categoria correta.', icon:'layers', engine:'sort',
+   config:{sets:[
+     {bins:['Cozinha','Escritório'], items:[['Panela','Cozinha'],['Caneta','Escritório'],['Colher','Cozinha'],['Grampeador','Escritório']]},
+     {bins:['Roupas','Alimentos','Papelaria'], items:[['Camisa','Roupas'],['Maçã','Alimentos'],['Caderno','Papelaria'],['Meia','Roupas'],['Pão','Alimentos'],['Borracha','Papelaria']]}
+   ]}},
+  {id:'exercicio-atencao', type:'activity', title:'Exercício de Atenção', category:'attention',
+   desc:'Encontre o item diferente entre os iguais, o mais rápido possível.', icon:'target', engine:'oddOneOut',
+   config:{}},
+  {id:'exercicio-concentracao', type:'activity', title:'Exercício de Concentração', category:'attention',
+   desc:'Clique apenas no alvo correto em cada rodada, ignorando distrações.', icon:'zap', engine:'reaction',
+   config:{}},
+  {id:'atividade-leitura', type:'activity', title:'Atividade de Leitura', category:'reading',
+   desc:'Leia o texto com calma e responda às perguntas sobre ele.', icon:'book', engine:'choice',
+   config:{reading:true, passage:`A tartaruga e o jardim: Uma tartaruga vivia em um jardim tranquilo. Todos os dias, ela caminhava devagar até o lago, observava as flores e voltava para descansar sob a sombra de uma árvore. Um dia, um coelho apressado perguntou por que ela nunca corria. A tartaruga respondeu que preferia chegar com calma e aproveitar o caminho, em vez de chegar cansada e sem lembrar do trajeto.`,
+   rounds:[
+     {question:'Onde a tartaruga vivia?', options:['Em um deserto','Em um jardim','Em uma floresta','Em uma cidade'], answer:1},
+     {question:'O que a tartaruga fazia todos os dias?', options:['Corria pela cidade','Caminhava até o lago','Dormia o dia todo','Nadava no mar'], answer:1},
+     {question:'Por que a tartaruga não corria?', options:['Estava com medo','Não sabia correr','Preferia aproveitar o caminho com calma','Estava machucada'], answer:2}
+   ]}},
+  {id:'coordenacao-visual', type:'activity', title:'Coordenação Visual', category:'visual',
+   desc:'Conecte os pontos em ordem numérica, com atenção e precisão.', icon:'eye', engine:'path',
+   config:{mode:'dots'}},
+  {id:'raciocinio-logico', type:'activity', title:'Raciocínio Lógico', category:'logic',
+   desc:'Escolha o elemento que não pertence ao grupo.', icon:'puzzle', engine:'choice',
+   config:{rounds:[
+     {question:'Qual não pertence ao grupo?', options:['Maçã','Banana','Cenoura','Uva'], answer:2},
+     {question:'Qual não pertence ao grupo?', options:['Carro','Ônibus','Bicicleta','Casa'], answer:3},
+     {question:'Qual não pertence ao grupo?', options:['Círculo','Quadrado','Triângulo','Vermelho'], answer:3},
+     {question:'Qual não pertence ao grupo?', options:['Cachorro','Gato','Peixe','Mesa'], answer:3},
+     {question:'Qual não pertence ao grupo?', options:['Segunda','Março','Sexta','Domingo'], answer:1}
+   ]}},
+  // ---- JOGOS ----
+  {id:'quebra-cabeca', type:'game', title:'Quebra-cabeça', category:'logic',
+   desc:'Reorganize as peças numeradas até formar a sequência correta.', icon:'puzzle', engine:'slide', config:{}},
+  {id:'jogo-memoria', type:'game', title:'Jogo da Memória', category:'memory',
+   desc:'O clássico jogo de virar cartas e encontrar os pares.', icon:'grid', engine:'memory',
+   config:{sets:[
+     ['◆','●','■','▲'],
+     ['◆','●','■','▲','★','✚'],
+     ['◆','●','■','▲','★','✚','◐','◇']
+   ]}},
+  {id:'labirinto', type:'game', title:'Labirinto', category:'visual',
+   desc:'Guie o ponto até a saída usando o teclado ou os botões.', icon:'compass', engine:'path', config:{mode:'maze'}},
+  {id:'encontrar-diferencas', type:'game', title:'Encontrar Diferenças', category:'attention',
+   desc:'Ache todos os símbolos diferentes escondidos na grade.', icon:'eye', engine:'oddOneOut', config:{multi:true}},
+  {id:'completar-padroes', type:'game', title:'Completar Padrões', category:'logic',
+   desc:'Observe o padrão visual e escolha o que vem a seguir.', icon:'shuffle', engine:'choice',
+   config:{rounds:[
+     {question:'▲ ● ▲ ● ▲ ...', options:['▲','●','■','★'], answer:1},
+     {question:'■ ■ ● ■ ■ ● ■ ■ ...', options:['■','●','▲','★'], answer:1},
+     {question:'★ ★★ ★★★ ...', options:['★','★★','★★★★','★★★★★'], answer:2},
+     {question:'◐ ◑ ◐ ◑ ◐ ...', options:['◐','◑','◆','●'], answer:1}
+   ]}},
+  {id:'arrastar-soltar', type:'game', title:'Arrastar e Soltar Objetos', category:'organization',
+   desc:'Arraste cada forma até o rótulo correspondente.', icon:'layers', engine:'sort',
+   config:{sets:[
+     {bins:['Formas','Letras'], items:[['●','Formas'],['A','Letras'],['■','Formas'],['B','Letras']]},
+     {bins:['Números','Formas','Letras'], items:[['7','Números'],['▲','Formas'],['C','Letras'],['3','Números'],['★','Formas'],['D','Letras']]}
+   ]}},
+  {id:'jogo-cores', type:'game', title:'Jogo de Cores', category:'attention',
+   desc:'Clique na cor da tinta em que a palavra está escrita — não no significado dela.', icon:'palette', engine:'stroop', config:{}},
+  {id:'jogo-sons', type:'game', title:'Jogo de Sons', category:'sound',
+   desc:'Repita a sequência de sons e cores na ordem correta.', icon:'ear', engine:'sequence', config:{}},
+  {id:'jogo-atencao', type:'game', title:'Jogo de Atenção', category:'attention',
+   desc:'Clique no alvo assim que ele aparecer na grade.', icon:'target', engine:'reaction', config:{whack:true}},
+  {id:'desafios-rapidos', type:'game', title:'Desafios Rápidos', category:'logic',
+   desc:'Resolva pequenos desafios de cálculo e lógica contra o tempo.', icon:'zap', engine:'quickchallenge', config:{}}
+];
+
+function getCatalogItem(id){ return CATALOG.find(c=>c.id===id); }
+
+/* ---------------- catalog rendering ---------------- */
+function renderCatalog(type){
+  const grid = document.getElementById(type==='activity'?'activities-grid':'games-grid');
+  const items = CATALOG.filter(c=>c.type===type);
+  grid.innerHTML = items.map(item=>{
+    const p = getItemProgress(item);
+    return `<button class="cat-card" data-open="${item.id}">
+      <div class="ic">${ICONS[item.icon]||''}</div>
+      <h3>${escapeHTML(item.title)}</h3>
+      <p>${escapeHTML(item.desc)}</p>
+      <div class="cat-foot">
+        <span class="pill">${CATEGORIES[item.category]||''}</span>
+        ${p.plays>0 ? `<span class="badge">${ICONS.star.replace('viewBox','width="12" height="12" viewBox')} melhor: ${p.best}%</span>` : `<span class="pill">Novo</span>`}
+      </div>
+    </button>`;
+  }).join('');
+  grid.querySelectorAll('[data-open]').forEach(btn=>{
+    btn.addEventListener('click', ()=> openPlayer(btn.dataset.open));
+  });
+}
+
+function getItemProgress(item){
+  if(!state.progress) return {plays:0,best:0};
+  const bucket = item.type==='activity' ? state.progress.activities : state.progress.games;
+  const rec = bucket[item.id];
+  if(!rec || !rec.length) return {plays:0,best:0};
+  const best = Math.max(...rec.map(r=> r.total? Math.round(r.score/r.total*100) : 0));
+  return {plays:rec.length, best};
+}
+
+async function saveProgress(item, difficulty, score, total){
+  const bucket = item.type==='activity' ? state.progress.activities : state.progress.games;
+  if(!bucket[item.id]) bucket[item.id]=[];
+  bucket[item.id].push({date:Date.now(), difficulty, score, total});
+  state.progress.sessions.push({id:item.id, type:item.type, title:item.title, date:Date.now(), difficulty, score, total});
+  state.progress.totalMinutes += 2 + Math.round(Math.random()*3);
+  state.progress.lastActive = todayISO();
+  await stSet('progress:'+state.user.email, state.progress);
+}
+
+/* ---------------- player shell ---------------- */
+const DIFFICULTIES = [{key:'easy',label:'Fácil'},{key:'medium',label:'Médio'},{key:'hard',label:'Difícil'}];
+
+function openPlayer(id){
+  const item = getCatalogItem(id);
+  if(!item) return;
+  state.currentPlayer = {item, difficulty:null};
+  document.getElementById('player-title').textContent = item.title;
+  document.getElementById('player-desc').textContent = item.desc;
+  const diffRow = document.getElementById('player-diff');
+  diffRow.innerHTML = DIFFICULTIES.map(d=>`<button class="chip" data-diff="${d.key}">${d.label}</button>`).join('');
+  diffRow.querySelectorAll('[data-diff]').forEach(b=>{
+    b.addEventListener('click', ()=>{
+      diffRow.querySelectorAll('.chip').forEach(c=>c.classList.remove('active'));
+      b.classList.add('active');
+      startEngine(item, b.dataset.diff);
+    });
+  });
+  showView('player');
+  showChooseDifficultyPrompt(item);
+}
+function showChooseDifficultyPrompt(item){
+  document.getElementById('player-stage-wrap').innerHTML = `
+    <div class="player-stage">
+      <div class="ic" style="width:64px;height:64px;border-radius:50%;background:var(--accent-soft);color:var(--accent-dark);display:flex;align-items:center;justify-content:center;">${ICONS[item.icon]}</div>
+      <p style="text-align:center;max-width:44ch;color:var(--text-muted);">Escolha um nível de dificuldade acima para começar.</p>
+    </div>`;
+}
+document.getElementById('player-back').addEventListener('click', ()=>{
+  stopAllEngineTimers();
+  if(state.currentPlayer && state.currentPlayer.cleanup){ state.currentPlayer.cleanup(); state.currentPlayer.cleanup=null; }
+  showView(state.currentPlayer && state.currentPlayer.item.type==='activity' ? 'activities':'games');
+});
+
+let engineTimers = [];
+function trackTimer(t){ engineTimers.push(t); return t; }
+function stopAllEngineTimers(){ engineTimers.forEach(t=>{clearInterval(t); clearTimeout(t);}); engineTimers=[]; }
+
+function startEngine(item, difficulty){
+  stopAllEngineTimers();
+  if(state.currentPlayer && state.currentPlayer.cleanup){ state.currentPlayer.cleanup(); state.currentPlayer.cleanup=null; }
+  state.currentPlayer.difficulty = difficulty;
+  const wrap = document.getElementById('player-stage-wrap');
+  const engines = {
+    match: engineMatch, memory: engineMemory, choice: engineChoice, sort: engineSort,
+    reaction: engineReaction, sequence: engineSequence, path: enginePath, slide: engineSlide,
+    oddOneOut: engineOddOneOut, stroop: engineStroop, quickchallenge: engineQuickChallenge
+  };
+  const fn = engines[item.engine];
+  if(!fn){ wrap.innerHTML = '<p>Motor não encontrado.</p>'; return; }
+  fn(wrap, item, difficulty);
+}
+
+function finishRound(item, difficulty, score, total, extraMsg){
+  if(state.currentPlayer && state.currentPlayer.cleanup){ state.currentPlayer.cleanup(); state.currentPlayer.cleanup=null; }
+  saveProgress(item, difficulty, score, total);
+  const wrap = document.getElementById('player-stage-wrap');
+  const pct = total? Math.round(score/total*100) : 0;
+  let msg = pct>=80 ? 'Excelente trabalho!' : pct>=50 ? 'Bom progresso, continue praticando.' : 'Continue tentando, cada rodada ajuda a treinar.';
+  wrap.innerHTML = `
+    <div class="player-stage">
+      <div class="result-panel" role="status" aria-live="polite">
+        <div class="ic" style="width:56px;height:56px;border-radius:50%;background:var(--success-soft);color:var(--success);display:flex;align-items:center;justify-content:center;margin:0 auto 14px;">${ICONS.check}</div>
+        <div class="score-big">${score}/${total}</div>
+        <p style="margin-top:8px;">${msg} ${extraMsg||''}</p>
+        <div class="breath-controls">
+          <button class="btn btn-primary" id="play-again">Jogar novamente</button>
+          <button class="btn btn-secondary" id="back-catalog">Voltar ao catálogo</button>
+        </div>
+      </div>
+    </div>`;
+  document.getElementById('play-again').addEventListener('click', ()=> startEngine(item, difficulty));
+  document.getElementById('back-catalog').addEventListener('click', ()=> showView(item.type==='activity'?'activities':'games'));
+  toast('Progresso salvo.');
+}
+
+/* ---------------- engine shared helpers ---------------- */
+function diffIndex(difficulty){ return {easy:0, medium:1, hard:2}[difficulty] ?? 0; }
+function shuffle(arr){ const a=[...arr]; for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
+function clamp(n,min,max){ return Math.max(min,Math.min(max,n)); }
+
+function ensureAudio(){
+  if(!state.audioCtx){
+    try{ state.audioCtx = new (window.AudioContext||window.webkitAudioContext)(); }catch(e){ return null; }
+  }
+  if(state.audioCtx.state==='suspended') state.audioCtx.resume();
+  return state.audioCtx;
+}
+function playTone(freq, dur=0.35, type='sine', vol=0.18){
+  const ctx = ensureAudio(); if(!ctx) return;
+  const osc = ctx.createOscillator(); const gain = ctx.createGain();
+  osc.type=type; osc.frequency.value=freq;
+  gain.gain.setValueAtTime(vol, ctx.currentTime);
+  gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime+dur);
+  osc.connect(gain); gain.connect(ctx.destination);
+  osc.start(); osc.stop(ctx.currentTime+dur);
+}
+function playFeedback(correct){ playTone(correct?523:196, correct?0.25:0.3, correct?'sine':'triangle', correct?0.12:0.1); }
+
+function hud(html){ return `<div class="player-hud">${html}</div>`; }
+
+/* simple original SVG face illustrations (no emoji) */
+function faceSVG(kind){
+  const mouths = {
+    happy:'<path d="M8 14.5c1.2 1.6 2.6 2.4 4 2.4s2.8-.8 4-2.4"/>',
+    sad:'<path d="M8 16.5c1.2-1.6 2.6-2.4 4-2.4s2.8.8 4 2.4"/>',
+    angry:'<path d="M8.3 15.5h7.4"/>',
+    surprised:'<circle cx="12" cy="15.5" r="1.8"/>',
+    calm:'<path d="M8.5 15c1-.6 2.2-.9 3.5-.9s2.5.3 3.5.9"/>',
+    scared:'<ellipse cx="12" cy="15.5" rx="2.4" ry="1.6"/>'
+  };
+  const brows = {
+    happy:'<path d="M7.5 8.3q1.3-1 2.6 0M13.9 8.3q1.3-1 2.6 0"/>',
+    sad:'<path d="M7.5 8.8q1.3.9 2.6 0M13.9 8.8q1.3.9 2.6 0"/>',
+    angry:'<path d="M7.3 8q1.6.3 2.9 1.2M16.7 8q-1.6.3-2.9 1.2"/>',
+    surprised:'<path d="M7.5 7.6q1.3-.6 2.6 0M13.9 7.6q1.3-.6 2.6 0"/>',
+    calm:'<path d="M7.6 8.4h2.4M14 8.4h2.4"/>',
+    scared:'<path d="M7.3 7.6q1.6-1 2.9 0M16.7 7.6q-1.6-1-2.9 0"/>'
+  };
+  return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" width="120" height="120" role="img" aria-label="${escapeHTML(FACE_DESCRIPTIONS[kind]||'Ilustração de um rosto')}">
+    <circle cx="12" cy="12" r="9.5"/>
+    <circle cx="9" cy="11.5" r=".9" fill="currentColor" stroke="none"/>
+    <circle cx="15" cy="11.5" r=".9" fill="currentColor" stroke="none"/>
+    ${brows[kind]||''}
+    ${mouths[kind]||mouths.calm}
+  </svg>`;
+}
+const FACE_DESCRIPTIONS = {
+  happy:'Sobrancelhas levemente curvadas para cima; cantos da boca elevados, formando um sorriso.',
+  sad:'Sobrancelhas inclinadas para baixo nas pontas externas; cantos da boca curvados para baixo.',
+  angry:'Sobrancelhas retas e próximas, inclinadas para dentro; boca em linha reta e tensa.',
+  surprised:'Sobrancelhas arqueadas e elevadas; boca pequena e arredondada, em formato de círculo.',
+  calm:'Sobrancelhas retas e relaxadas; boca em uma curva suave, sem tensão aparente.',
+  scared:'Sobrancelhas elevadas e puxadas para dentro; boca alongada horizontalmente e tensa.'
+};
+
+/* ============ ENGINE: match (association pairs, all cards face-up) ============ */
+function engineMatch(wrap, item, difficulty){
+  const group = item.config.groups[clamp(diffIndex(difficulty),0,item.config.groups.length-1)];
+  const pairs = group.pairs;
+  let cards = [];
+  pairs.forEach((p,i)=>{ cards.push({text:p[0], pid:i, cid:uid()}, {text:p[1], pid:i, cid:uid()}); });
+  cards = shuffle(cards);
+  let selected = [], matched = new Set(), attempts=0;
+  const cols = cards.length<=8?4:cards.length<=12?4:6;
+  function draw(){
+    wrap.innerHTML = hud(`<span>Pares encontrados: <b>${matched.size}/${pairs.length}</b></span>`) +
+      `<div class="tile-grid" style="grid-template-columns:repeat(${cols},1fr);max-width:${cols*110}px;margin:0 auto;" role="group" aria-label="Cartas de associação">
+        ${cards.map(c=>`<button class="tile" style="font-size:.85rem;padding:6px;" data-cid="${c.cid}" aria-pressed="false">${escapeHTML(c.text)}</button>`).join('')}
+      </div>`;
+    wrap.querySelectorAll('.tile').forEach(t=>{
+      const c = cards.find(x=>x.cid===t.dataset.cid);
+      if(matched.has(c.pid) ) t.classList.add('correct');
+      t.addEventListener('click', ()=>onPick(c,t));
+    });
+  }
+  function onPick(c,t){
+    if(matched.has(c.pid) || selected.find(s=>s.c.cid===c.cid) || selected.length>=2) return;
+    t.classList.add('selected'); t.setAttribute('aria-pressed','true');
+    selected.push({c,t});
+    if(selected.length===2){
+      attempts++;
+      const [a,b] = selected;
+      if(a.c.pid===b.c.pid){
+        matched.add(a.c.pid); playFeedback(true);
+        a.t.classList.add('correct'); b.t.classList.add('correct');
+        selected=[];
+        if(matched.size===pairs.length){
+          trackTimer(setTimeout(()=> finishRound(item, difficulty, matched.size, pairs.length), 500));
+        } else { draw(); }
+      } else {
+        playFeedback(false);
+        a.t.classList.add('wrong'); b.t.classList.add('wrong');
+        trackTimer(setTimeout(()=>{ a.t.classList.remove('selected','wrong'); b.t.classList.remove('selected','wrong'); a.t.setAttribute('aria-pressed','false'); b.t.setAttribute('aria-pressed','false'); selected=[]; }, 650));
+      }
+    }
+  }
+  draw();
+}
+
+/* ============ ENGINE: memory (flip two cards) ============ */
+function engineMemory(wrap, item, difficulty){
+  const symbols = item.config.sets[clamp(diffIndex(difficulty),0,item.config.sets.length-1)];
+  let cards = shuffle(symbols.flatMap((s,i)=>[{s,pid:i,cid:uid()},{s,pid:i,cid:uid()}]));
+  let flipped=[], matched=new Set(), locked=false, moves=0;
+  const cols = cards.length<=8?4:cards.length<=12?4:6;
+  function draw(){
+    wrap.innerHTML = hud(`<span>Pares: <b>${matched.size}/${symbols.length}</b></span><span>Jogadas: <b>${moves}</b></span>`) +
+      `<div class="tile-grid" style="grid-template-columns:repeat(${cols},1fr);max-width:${cols*90}px;margin:0 auto;">
+        ${cards.map(c=>`<button class="tile" data-cid="${c.cid}" aria-label="Carta virada para baixo">${matched.has(c.pid)||flipped.find(f=>f.cid===c.cid) ? escapeHTML(c.s) : '?'}</button>`).join('')}
+      </div>`;
+    wrap.querySelectorAll('.tile').forEach(t=>{
+      const c = cards.find(x=>x.cid===t.dataset.cid);
+      if(matched.has(c.pid)) t.classList.add('correct');
+      t.addEventListener('click', ()=>onFlip(c));
+    });
+  }
+  function onFlip(c){
+    if(locked || matched.has(c.pid) || flipped.find(f=>f.cid===c.cid)) return;
+    flipped.push(c); draw();
+    if(flipped.length===2){
+      moves++; locked=true;
+      if(flipped[0].pid===flipped[1].pid){
+        matched.add(flipped[0].pid); playFeedback(true); flipped=[]; locked=false;
+        if(matched.size===symbols.length){
+          trackTimer(setTimeout(()=> finishRound(item, difficulty, symbols.length, symbols.length, `Total de jogadas: ${moves}.`), 500));
+        } else draw();
+      } else {
+        playFeedback(false);
+        trackTimer(setTimeout(()=>{ flipped=[]; locked=false; draw(); }, 750));
+      }
+    }
+  }
+  draw();
+}
+
+/* ============ ENGINE: choice (multiple choice rounds — logic, emotion, reading) ============ */
+function engineChoice(wrap, item, difficulty){
+  const cfg = item.config;
+  const n = difficulty==='easy'?Math.min(3,cfg.rounds.length):difficulty==='medium'?Math.min(5,cfg.rounds.length):cfg.rounds.length;
+  const rounds = shuffle(cfg.rounds).slice(0,n);
+  let idx=0, score=0, showedPassage=false;
+  function draw(){
+    if(idx>=rounds.length){ finishRound(item, difficulty, score, rounds.length); return; }
+    const r = rounds[idx];
+    let passageHTML='';
+    if(cfg.reading && !showedPassage){
+      passageHTML = `<div class="card" style="max-width:60ch;margin-bottom:18px;text-align:left;"><p style="margin:0;">${escapeHTML(cfg.passage)}</p></div>`;
+    }
+    wrap.innerHTML = hud(`<span>Pergunta <b>${idx+1}</b> de <b>${rounds.length}</b></span><span>Pontos: <b>${score}</b></span>`) +
+      `<div class="player-stage" style="min-height:auto;padding-top:6px;">
+        ${passageHTML}
+        ${r.face ? `<div style="color:var(--accent-dark);">${faceSVG(r.face)}</div><p class="a11y-desc">Descrição de áudio: ${escapeHTML(FACE_DESCRIPTIONS[r.face]||'')}</p>`:''}
+        <h3 style="text-align:center;max-width:44ch;">${escapeHTML(r.question)}</h3>
+        <div class="choice-list" role="group" aria-label="Alternativas">
+          ${r.options.map((o,i)=>`<button class="choice-btn" data-i="${i}">${escapeHTML(o)}</button>`).join('')}
+        </div>
+      </div>`;
+    let answered=false;
+    wrap.querySelectorAll('.choice-btn').forEach(b=>{
+      b.addEventListener('click', ()=>{
+        if(answered) return; answered=true;
+        const i = parseInt(b.dataset.i,10);
+        const correct = i===r.answer;
+        if(correct) score++;
+        playFeedback(correct);
+        b.classList.add(correct?'correct':'wrong');
+        if(!correct) wrap.querySelector(`[data-i="${r.answer}"]`).classList.add('correct');
+        trackTimer(setTimeout(()=>{ idx++; draw(); }, 1000));
+      });
+    });
+  }
+  draw();
+}
+
+/* ============ ENGINE: sort (drag & drop + click-to-place, keyboard accessible) ============ */
+function engineSort(wrap, item, difficulty){
+  const set = item.config.sets[clamp(diffIndex(difficulty),0,item.config.sets.length-1)];
+  const items = shuffle(set.items.map(([label,bin])=>({label,bin,id:uid(),placed:null})));
+  let selectedId=null, correctCount=0;
+  function draw(){
+    const placedCount = items.filter(i=>i.placed).length;
+    wrap.innerHTML = hud(`<span>Organizados: <b>${placedCount}/${items.length}</b></span><span>Corretos: <b>${correctCount}</b></span>`) +
+      `<p style="text-align:center;color:var(--text-muted);font-size:.86rem;margin-bottom:10px;">Toque em um item e depois na categoria — ou arraste o item até o local certo.</p>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-bottom:20px;" id="sort-pool" role="group" aria-label="Itens para organizar">
+        ${items.filter(i=>!i.placed).map(i=>`<button class="drag-chip" draggable="true" data-id="${i.id}" aria-pressed="false">${escapeHTML(i.label)}</button>`).join('')}
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(${set.bins.length},1fr);gap:14px;width:100%;max-width:620px;">
+        ${set.bins.map(bin=>`<div>
+          <div style="font-weight:700;text-align:center;margin-bottom:6px;font-size:.88rem;">${escapeHTML(bin)}</div>
+          <div class="dropzone" data-bin="${escapeHTML(bin)}">
+            ${items.filter(i=>i.placed===bin).map(i=>`<span class="drag-chip" style="cursor:default;${i.correct?'':'background:var(--danger-soft);color:var(--danger);'}">${escapeHTML(i.label)}</span>`).join('')}
+          </div>
+        </div>`).join('')}
+      </div>`;
+    wrap.querySelectorAll('.drag-chip[draggable]').forEach(chip=>{
+      chip.addEventListener('click', ()=>{
+        wrap.querySelectorAll('.drag-chip[draggable]').forEach(c=>c.setAttribute('aria-pressed','false'));
+        selectedId = chip.dataset.id; chip.setAttribute('aria-pressed','true');
+      });
+      chip.addEventListener('dragstart', e=>{ e.dataTransfer.setData('text/plain', chip.dataset.id); });
+    });
+    wrap.querySelectorAll('.dropzone').forEach(zone=>{
+      zone.addEventListener('dragover', e=>{ e.preventDefault(); zone.classList.add('over'); });
+      zone.addEventListener('dragleave', ()=> zone.classList.remove('over'));
+      zone.addEventListener('drop', e=>{ e.preventDefault(); zone.classList.remove('over'); place(e.dataTransfer.getData('text/plain'), zone.dataset.bin); });
+      zone.addEventListener('click', ()=>{ if(selectedId){ place(selectedId, zone.dataset.bin); selectedId=null; } });
+    });
+  }
+  function place(id, bin){
+    const it = items.find(i=>i.id===id); if(!it || it.placed) return;
+    it.placed = bin; it.correct = it.bin===bin;
+    if(it.correct) { correctCount++; playFeedback(true); } else playFeedback(false);
+    if(items.every(i=>i.placed)){
+      trackTimer(setTimeout(()=> finishRound(item, difficulty, correctCount, items.length), 500));
+    } else draw();
+  }
+  draw();
+}
+
+/* ============ ENGINE: reaction (attention / concentration / whack) ============ */
+function engineReaction(wrap, item, difficulty){
+  const rounds = difficulty==='easy'?8:difficulty==='medium'?12:16;
+  const timeMs = difficulty==='easy'?2200:difficulty==='medium'?1600:1200;
+  const gridSize = difficulty==='easy'?3:4;
+  let round=0, score=0, timer=null;
+  function draw(){
+    if(round>=rounds){ finishRound(item, difficulty, score, rounds); return; }
+    const total = gridSize*gridSize;
+    const targetPos = Math.floor(Math.random()*total);
+    wrap.innerHTML = hud(`<span>Rodada <b>${round+1}</b> de <b>${rounds}</b></span><span>Acertos: <b>${score}</b></span>`) +
+      `<div class="tile-grid" style="grid-template-columns:repeat(${gridSize},1fr);max-width:${gridSize*90}px;margin:0 auto;" role="group" aria-label="Clique no alvo destacado">
+        ${Array.from({length:total}).map((_,i)=>`<button class="tile" data-i="${i}" aria-label="${i===targetPos?'alvo':'vazio'}">${i===targetPos?ICONS.target:''}</button>`).join('')}
+      </div>`;
+    let answered=false;
+    const start = Date.now();
+    timer = trackTimer(setTimeout(()=>{ if(!answered){ answered=true; playFeedback(false); round++; draw(); } }, timeMs));
+    wrap.querySelectorAll('.tile').forEach(t=>{
+      t.addEventListener('click', ()=>{
+        if(answered) return; answered=true; clearTimeout(timer);
+        const hit = parseInt(t.dataset.i,10)===targetPos;
+        if(hit){ score++; t.classList.add('correct'); } else t.classList.add('wrong');
+        playFeedback(hit);
+        round++;
+        trackTimer(setTimeout(draw, 250));
+      });
+    });
+  }
+  draw();
+}
+
+/* ============ ENGINE: sequence (Simon-style sound/color repeat) ============ */
+function engineSequence(wrap, item, difficulty){
+  const maxLen = difficulty==='easy'?5:difficulty==='medium'?7:9;
+  const pads = [{c:'#3D7A6E',f:261.6},{c:'#C48A2E',f:329.6},{c:'#B5602F',f:392.0},{c:'#5B7DB1',f:440.0}];
+  let sequence=[], userIdx=0, playing=true, level=0;
+  function draw(msg){
+    wrap.innerHTML = hud(`<span>Nível: <b>${level}</b></span><span>Meta: <b>${maxLen}</b></span>`) +
+      `<p style="text-align:center;color:var(--text-muted);min-height:22px;">${msg||''}</p>
+      <div class="tile-grid" style="grid-template-columns:repeat(2,1fr);max-width:220px;margin:0 auto;gap:14px;">
+        ${pads.map((p,i)=>`<button class="tile" data-i="${i}" style="background:${p.c};opacity:.85;height:90px;" aria-label="Cor ${i+1}"></button>`).join('')}
+      </div>`;
+    wrap.querySelectorAll('.tile').forEach(t=>{
+      t.addEventListener('click', ()=>{ if(playing) return; onUserPress(parseInt(t.dataset.i,10), t); });
+    });
+  }
+  function nextRound(){
+    level++;
+    sequence.push(Math.floor(Math.random()*4));
+    userIdx=0; playing=true;
+    draw('Observe a sequência...');
+    let i=0;
+    function step(){
+      if(i>=sequence.length){ playing=false; draw('Sua vez! Repita a sequência.'); return; }
+      const pos = sequence[i];
+      const tile = wrap.querySelectorAll('.tile')[pos];
+      if(tile){ tile.style.opacity='1'; playTone(pads[pos].f,0.35); }
+      trackTimer(setTimeout(()=>{ if(tile) tile.style.opacity='.85'; i++; trackTimer(setTimeout(step,180)); }, 420));
+    }
+    trackTimer(setTimeout(step, 500));
+  }
+  function onUserPress(i, t){
+    t.style.opacity='1'; playTone(pads[i].f,0.25); trackTimer(setTimeout(()=>{t.style.opacity='.85';},200));
+    if(sequence[userIdx]===i){
+      userIdx++;
+      if(userIdx===sequence.length){
+        if(level>=maxLen){ finishRound(item, difficulty, level, maxLen, 'Você completou o nível máximo!'); return; }
+        trackTimer(setTimeout(nextRound, 600));
+      }
+    } else {
+      playFeedback(false);
+      finishRound(item, difficulty, level-1, maxLen, 'Sequência quebrada — mas ótimo esforço!');
+    }
+  }
+  nextRound();
+}
+
+/* ============ ENGINE: path (dots-in-order / maze navigation) ============ */
+function enginePath(wrap, item, difficulty){
+  if(item.config.mode==='dots') return pathDots(wrap,item,difficulty);
+  return pathMaze(wrap,item,difficulty);
+}
+function pathDots(wrap, item, difficulty){
+  const n = difficulty==='easy'?5:difficulty==='medium'?7:10;
+  const W=420,H=280, pts=[]; const cellW=W/Math.ceil(Math.sqrt(n*1.6)), cellH=H/Math.ceil(Math.sqrt(n*1.6));
+  const cols = Math.ceil(W/70), rows = Math.ceil(H/70);
+  const cells = shuffle(Array.from({length:cols*rows},(_,i)=>i)).slice(0,n);
+  cells.forEach((cIdx,order)=>{
+    const cx = cIdx%cols, cy=Math.floor(cIdx/cols);
+    const x = clamp(cx*(W/cols) + (W/cols)/2 + (Math.random()*20-10), 24, W-24);
+    const y = clamp(cy*(H/rows) + (H/rows)/2 + (Math.random()*20-10), 24, H-24);
+    pts.push({num:order+1, x, y});
+  });
+  let next=1, clicks=0, wrongClicks=0;
+  function draw(){
+    wrap.innerHTML = hud(`<span>Próximo número: <b>${next<=n?next:'concluído'}</b></span><span>Progresso: <b>${next-1}/${n}</b></span>`) +
+      `<svg viewBox="0 0 ${W} ${H}" style="width:100%;max-width:520px;background:var(--bg-soft);border-radius:12px;" role="group" aria-label="Conecte os pontos em ordem numérica">
+        ${pts.filter(p=>p.num<next-0.5 && p.num>1).map(p=>{const prev=pts.find(q=>q.num===p.num-1); return prev?`<line x1="${prev.x}" y1="${prev.y}" x2="${p.x}" y2="${p.y}" stroke="var(--accent)" stroke-width="2.5"/>`:'';}).join('')}
+        ${pts.map(p=>`<g class="dot-el" data-n="${p.num}" tabindex="0" role="button" aria-label="Ponto ${p.num}" style="cursor:pointer;">
+          <circle cx="${p.x}" cy="${p.y}" r="14" fill="${p.num<next?'var(--accent)':'var(--bg-elevated)'}" stroke="var(--accent)" stroke-width="2"/>
+          <text x="${p.x}" y="${p.y+4}" text-anchor="middle" font-size="12" font-weight="700" fill="${p.num<next?'#fff':'var(--text)'}">${p.num}</text>
+        </g>`).join('')}
+      </svg>`;
+    wrap.querySelectorAll('.dot-el').forEach(el=>{
+      const activate = ()=>onDot(parseInt(el.dataset.n,10));
+      el.addEventListener('click', activate);
+      el.addEventListener('keydown', e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); activate(); } });
+    });
+  }
+  function onDot(num){
+    if(num===next){ playFeedback(true); next++; clicks++;
+      if(next>n){ trackTimer(setTimeout(()=> finishRound(item, difficulty, n, n, wrongClicks?`(${wrongClicks} tentativa(s) fora de ordem)`:''),400)); return; }
+      draw();
+    } else { wrongClicks++; playFeedback(false); }
+  }
+  draw();
+}
+function pathMaze(wrap, item, difficulty){
+  const size = difficulty==='easy'?6:difficulty==='medium'?8:10;
+  const cols=size, rows=size;
+  const cells = Array.from({length:rows},()=>Array.from({length:cols},()=>({N:true,E:true,S:true,W:true,visited:false})));
+  (function carve(cx,cy){
+    cells[cy][cx].visited=true;
+    shuffle([[0,-1,'N','S'],[1,0,'E','W'],[0,1,'S','N'],[-1,0,'W','E']]).forEach(([dx,dy,d1,d2])=>{
+      const nx=cx+dx, ny=cy+dy;
+      if(nx>=0&&nx<cols&&ny>=0&&ny<rows&&!cells[ny][nx].visited){ cells[cy][cx][d1]=false; cells[ny][nx][d2]=false; carve(nx,ny); }
+    });
+  })(0,0);
+  const W=2*cols+1, H=2*rows+1;
+  const grid = Array.from({length:H},()=>Array(W).fill(1));
+  for(let cy=0;cy<rows;cy++) for(let cx=0;cx<cols;cx++){
+    grid[2*cy+1][2*cx+1]=0;
+    if(!cells[cy][cx].N) grid[2*cy][2*cx+1]=0;
+    if(!cells[cy][cx].S) grid[2*cy+2][2*cx+1]=0;
+    if(!cells[cy][cx].W) grid[2*cy+1][2*cx]=0;
+    if(!cells[cy][cx].E) grid[2*cy+1][2*cx+2]=0;
+  }
+  let pos={r:1,c:1}; const goal={r:H-2,c:W-2}; let moves=0;
+  const cellPx = clamp(Math.floor(340/W),16,26);
+  function draw(){
+    wrap.innerHTML = hud(`<span>Movimentos: <b>${moves}</b></span>`) +
+      `<div class="maze-grid" style="grid-template-columns:repeat(${W},${cellPx}px);" role="group" aria-label="Labirinto, use as setas do teclado">
+        ${grid.map((row,r)=>row.map((v,c)=>{
+          let cls='maze-cell'+(v===1?' wall':'');
+          if(r===pos.r&&c===pos.c) cls+=' player';
+          else if(r===goal.r&&c===goal.c) cls+=' goal';
+          return `<div class="${cls}" style="width:${cellPx}px;height:${cellPx}px;"></div>`;
+        }).join('')).join('')}
+      </div>
+      <div class="breath-controls" role="group" aria-label="Controles de movimento">
+        <button class="btn btn-secondary btn-sm" data-dir="up">Cima</button>
+        <button class="btn btn-secondary btn-sm" data-dir="down">Baixo</button>
+        <button class="btn btn-secondary btn-sm" data-dir="left">Esquerda</button>
+        <button class="btn btn-secondary btn-sm" data-dir="right">Direita</button>
+      </div>
+      <p style="text-align:center;color:var(--text-muted);font-size:.82rem;">Você também pode usar as setas do teclado.</p>`;
+    wrap.querySelectorAll('[data-dir]').forEach(b=> b.addEventListener('click', ()=> move(b.dataset.dir)));
+  }
+  function move(dir){
+    const d = {up:[-1,0],down:[1,0],left:[0,-1],right:[0,1]}[dir];
+    const nr=pos.r+d[0], nc=pos.c+d[1];
+    if(grid[nr] && grid[nr][nc]===0){ pos={r:nr,c:nc}; moves++;
+      if(pos.r===goal.r && pos.c===goal.c){ playFeedback(true); trackTimer(setTimeout(()=>finishRound(item,difficulty,1,1,`Concluído em ${moves} movimentos.`),400)); return; }
+      draw();
+      wrap.querySelector('.maze-grid')?.focus?.();
+    }
+  }
+  function keyHandler(e){
+    if(!document.getElementById('view-player') || document.getElementById('view-player').hidden) return;
+    const map={ArrowUp:'up',ArrowDown:'down',ArrowLeft:'left',ArrowRight:'right'};
+    if(map[e.key]){ e.preventDefault(); move(map[e.key]); }
+  }
+  document.addEventListener('keydown', keyHandler);
+  state.currentPlayer.cleanup = ()=> document.removeEventListener('keydown', keyHandler);
+  draw();
+}
+
+/* ============ ENGINE: slide (numbered sliding puzzle) ============ */
+function engineSlide(wrap, item, difficulty){
+  const size = difficulty==='easy'?3:difficulty==='medium'?4:5;
+  const total = size*size;
+  let tiles = Array.from({length:total-1},(_,i)=>i+1); tiles.push(0); // 0 = blank
+  function isSolvable(arr){
+    let inv=0; const flat=arr.filter(v=>v!==0);
+    for(let i=0;i<flat.length;i++) for(let j=i+1;j<flat.length;j++) if(flat[i]>flat[j]) inv++;
+    if(size%2===1) return inv%2===0;
+    const blankRow = Math.floor(arr.indexOf(0)/size);
+    return (inv + blankRow) % 2 === 1;
+  }
+  do{ tiles = shuffle(tiles); } while(!isSolvable(tiles) || tiles.every((v,i)=> v===((i+1)%total)));
+  let moves=0;
+  function draw(){
+    const solved = tiles.every((v,i)=> v===((i+1)%total));
+    wrap.innerHTML = hud(`<span>Movimentos: <b>${moves}</b></span>`) +
+      `<div class="tile-grid" style="grid-template-columns:repeat(${size},1fr);max-width:${size*80}px;margin:0 auto;" role="group" aria-label="Quebra-cabeça deslizante">
+        ${tiles.map((v,i)=> v===0 ? `<div class="tile" style="background:none;border-style:dashed;"></div>` : `<button class="tile" data-i="${i}" style="font-size:1.1rem;background:var(--accent-soft);color:var(--accent-dark);">${v}</button>`).join('')}
+      </div>`;
+    if(solved){ trackTimer(setTimeout(()=> finishRound(item, difficulty, 1, 1, `Resolvido em ${moves} movimentos.`), 400)); return; }
+    wrap.querySelectorAll('.tile[data-i]').forEach(t=>{
+      t.addEventListener('click', ()=>{
+        const i = parseInt(t.dataset.i,10);
+        const blank = tiles.indexOf(0);
+        const ir=Math.floor(i/size), ic=i%size, br=Math.floor(blank/size), bc=blank%size;
+        if(Math.abs(ir-br)+Math.abs(ic-bc)===1){ [tiles[i],tiles[blank]]=[tiles[blank],tiles[i]]; moves++; draw(); }
+      });
+    });
+  }
+  draw();
+}
+
+/* ============ ENGINE: oddOneOut (attention grid / spot differences) ============ */
+function engineOddOneOut(wrap, item, difficulty){
+  const symbols = ['●','■','▲','◆','★'];
+  const size = difficulty==='easy'?4:difficulty==='medium'?5:6;
+  const rounds = difficulty==='easy'?4:difficulty==='medium'?5:6;
+  let round=0, score=0;
+  function draw(){
+    if(round>=rounds){ finishRound(item, difficulty, score, rounds); return; }
+    const base = symbols[Math.floor(Math.random()*symbols.length)];
+    const total = size*size;
+    const oddCount = item.config.multi ? Math.min(3, Math.floor(total/8)+1) : 1;
+    const oddPositions = new Set(shuffle(Array.from({length:total},(_,i)=>i)).slice(0,oddCount));
+    let found = new Set();
+    wrap.innerHTML = hud(`<span>Rodada <b>${round+1}</b>/<b>${rounds}</b></span><span>Encontre: <b>${oddCount - found.size}</b></span>`) +
+      `<div class="tile-grid" style="grid-template-columns:repeat(${size},1fr);max-width:${size*66}px;margin:0 auto;font-size:1.4rem;" role="group" aria-label="Encontre o símbolo diferente">
+        ${Array.from({length:total}).map((_,i)=>`<button class="tile" data-i="${i}" data-odd="${oddPositions.has(i)?1:0}">${oddPositions.has(i)? rotatedSymbol(base) : base}</button>`).join('')}
+      </div>`;
+    wrap.querySelectorAll('.tile').forEach(t=>{
+      t.addEventListener('click', ()=>{
+        const i = parseInt(t.dataset.i,10);
+        if(t.dataset.odd==='1'){
+          if(!found.has(i)){ found.add(i); t.classList.add('correct'); playFeedback(true);
+            const hudEl = wrap.querySelector('.player-hud'); if(hudEl) hudEl.innerHTML = `<span>Rodada <b>${round+1}</b>/<b>${rounds}</b></span><span>Encontre: <b>${oddCount - found.size}</b></span>`;
+            if(found.size===oddCount){ score++; round++; trackTimer(setTimeout(draw, 500)); }
+          }
+        } else { playFeedback(false); t.classList.add('wrong'); trackTimer(setTimeout(()=>t.classList.remove('wrong'),300)); }
+      });
+    });
+  }
+  function rotatedSymbol(s){ return s; } // visually distinct via CSS transform below
+  draw();
+}
+// give odd tiles a subtle visual distinction (rotation/opacity) so they are genuinely findable
+document.head.insertAdjacentHTML('beforeend', `<style>.tile[data-odd="1"]{transform:rotate(18deg) scale(.88);opacity:.72;}</style>`);
+
+/* ============ ENGINE: stroop (color game) ============ */
+function engineStroop(wrap, item, difficulty){
+  const colors = [{name:'Vermelho',hex:'#B24A42'},{name:'Azul',hex:'#3D6FA6'},{name:'Verde',hex:'#4C8567'},{name:'Amarelo',hex:'#C48A2E'}];
+  const rounds = difficulty==='easy'?6:difficulty==='medium'?9:12;
+  let round=0, score=0;
+  function draw(){
+    if(round>=rounds){ finishRound(item, difficulty, score, rounds); return; }
+    const wordColor = colors[Math.floor(Math.random()*colors.length)];
+    let inkColor = colors[Math.floor(Math.random()*colors.length)];
+    if(difficulty!=='easy' && Math.random()<0.7){ do{ inkColor = colors[Math.floor(Math.random()*colors.length)]; } while(inkColor.name===wordColor.name); }
+    wrap.innerHTML = hud(`<span>Rodada <b>${round+1}</b>/<b>${rounds}</b></span><span>Pontos: <b>${score}</b></span>`) +
+      `<div class="player-stage" style="min-height:auto;">
+        <p style="text-align:center;color:var(--text-muted);">Clique na cor da <b>tinta</b> em que a palavra está escrita.</p>
+        <div style="font-family:var(--font-display);font-size:2.4rem;font-weight:600;color:${inkColor.hex};" aria-label="Palavra ${wordColor.name} escrita em tinta ${inkColor.name}">${wordColor.name}</div>
+        <div class="choice-list">
+          ${shuffle(colors).map(c=>`<button class="choice-btn" data-name="${c.name}" style="border-color:${c.hex};">${c.name}</button>`).join('')}
+        </div>
+      </div>`;
+    let answered=false;
+    wrap.querySelectorAll('.choice-btn').forEach(b=>{
+      b.addEventListener('click', ()=>{
+        if(answered) return; answered=true;
+        const correct = b.dataset.name===inkColor.name;
+        if(correct) score++;
+        playFeedback(correct);
+        b.classList.add(correct?'correct':'wrong');
+        if(!correct) wrap.querySelector(`[data-name="${inkColor.name}"]`).classList.add('correct');
+        round++;
+        trackTimer(setTimeout(draw, 900));
+      });
+    });
+  }
+  draw();
+}
+
+/* ============ ENGINE: quickchallenge (timed mini math/pattern rounds) ============ */
+function engineQuickChallenge(wrap, item, difficulty){
+  const rounds = difficulty==='easy'?6:difficulty==='medium'?9:12;
+  const timeLimit = difficulty==='easy'?9:difficulty==='medium'?6:4;
+  let round=0, score=0;
+  function gen(){
+    const a = Math.floor(Math.random()*(difficulty==='hard'?30:15))+1;
+    const b = Math.floor(Math.random()*(difficulty==='hard'?30:15))+1;
+    const ops = difficulty==='easy'?['+']:difficulty==='medium'?['+','-']:['+','-','×'];
+    const op = ops[Math.floor(Math.random()*ops.length)];
+    const correct = op==='+'?a+b:op==='-'?a-b:a*b;
+    const options = new Set([correct]);
+    while(options.size<4) options.add(correct + (Math.floor(Math.random()*9)-4));
+    return {q:`${a} ${op} ${b} = ?`, options:shuffle([...options]), correct};
+  }
+  function draw(){
+    if(round>=rounds){ finishRound(item, difficulty, score, rounds); return; }
+    const r = gen();
+    let timeLeft = timeLimit;
+    wrap.innerHTML = hud(`<span>Desafio <b>${round+1}</b>/<b>${rounds}</b></span><span>Pontos: <b>${score}</b></span><span id="qc-time"><b>${timeLeft}s</b></span>`) +
+      `<div class="player-stage" style="min-height:auto;">
+        <h3 style="text-align:center;">${r.q}</h3>
+        <div class="choice-list">${r.options.map(o=>`<button class="choice-btn" data-v="${o}">${o}</button>`).join('')}</div>
+      </div>`;
+    let answered=false;
+    const tick = setInterval(()=>{
+      timeLeft--; const el = document.getElementById('qc-time'); if(el) el.innerHTML=`<b>${Math.max(timeLeft,0)}s</b>`;
+      if(timeLeft<=0){ clearInterval(tick); if(!answered){ answered=true; playFeedback(false); round++; trackTimer(setTimeout(draw,600)); } }
+    },1000);
+    trackTimer(tick);
+    wrap.querySelectorAll('.choice-btn').forEach(b=>{
+      b.addEventListener('click', ()=>{
+        if(answered) return; answered=true; clearInterval(tick);
+        const correct = parseInt(b.dataset.v,10)===r.correct;
+        if(correct) score++;
+        playFeedback(correct);
+        b.classList.add(correct?'correct':'wrong');
+        round++;
+        trackTimer(setTimeout(draw, 600));
+      });
+    });
+  }
+  draw();
+}
+
+/* ---------------- dashboard ---------------- */
+function renderDashboard(){
+  document.getElementById('dash-greeting').textContent = `Olá, ${state.user.name.split(' ')[0]}!`;
+  const p = state.progress;
+  const totalPlays = Object.values(p.activities).flat().length + Object.values(p.games).flat().length;
+  const allScores = [...Object.values(p.activities).flat(), ...Object.values(p.games).flat()];
+  const avgPct = allScores.length ? Math.round(allScores.reduce((s,r)=> s + (r.total? r.score/r.total*100:0),0)/allScores.length) : 0;
+  document.getElementById('dash-stats').innerHTML = `
+    <div class="stat-card"><b>${totalPlays}</b><span>Atividades e jogos concluídos</span></div>
+    <div class="stat-card"><b>${p.totalMinutes}</b><span>Minutos de uso estimados</span></div>
+    <div class="stat-card"><b>${avgPct}%</b><span>Desempenho médio</span></div>
+    <div class="stat-card"><b>${state.agenda.filter(t=>!t.done).length}</b><span>Tarefas pendentes</span></div>`;
+  const recommended = shuffle(CATALOG.filter(c=>c.type==='game')).slice(0,3);
+  document.getElementById('dash-recommended').innerHTML = recommended.map(item=>`
+    <div class="list-row">
+      <div class="ic">${ICONS[item.icon]}</div>
+      <div class="meta"><b>${escapeHTML(item.title)}</b><span>${CATEGORIES[item.category]}</span></div>
+      <button class="btn btn-secondary btn-sm" data-open="${item.id}">Jogar</button>
+    </div>`).join('') || '<p style="color:var(--text-muted);">Nenhum jogo disponível.</p>';
+  document.querySelectorAll('#dash-recommended [data-open]').forEach(b=> b.addEventListener('click', ()=>{ showView(b.closest('button')?'games':'games'); openPlayer(b.dataset.open); }));
+
+  const recent = [...p.sessions].sort((a,b)=>b.date-a.date).slice(0,5);
+  document.getElementById('dash-recent').innerHTML = recent.length ? recent.map(s=>`
+    <div class="list-row">
+      <div class="ic">${ICONS[getCatalogItem(s.id)?.icon || 'star']}</div>
+      <div class="meta"><b>${escapeHTML(s.title)}</b><span>${new Date(s.date).toLocaleDateString('pt-BR')} · ${s.score}/${s.total}</span></div>
+    </div>`).join('') : '<p style="color:var(--text-muted);">Você ainda não realizou nenhuma atividade. Que tal começar agora?</p>';
+
+  const todayTasks = state.agenda.filter(t=>t.date===todayISO());
+  document.getElementById('dash-agenda').innerHTML = todayTasks.length ? todayTasks.map(t=>`
+    <div class="list-row"><div class="ic">${ICONS.calendar}</div><div class="meta"><b>${escapeHTML(t.title)}</b><span>${t.time||'Sem horário definido'}</span></div></div>`).join('')
+    : '<p style="color:var(--text-muted);">Nenhuma tarefa para hoje. Aproveite para visitar a Agenda e planejar sua rotina.</p>';
+}
+
+/* ---------------- landing showcase ---------------- */
+function renderLandingShowcase(){
+  const sample = [CATALOG[0],CATALOG[10],CATALOG[2],CATALOG[13],CATALOG[8],CATALOG[15],CATALOG[6],CATALOG[16]];
+  document.getElementById('landing-showcase').innerHTML = sample.map(item=>`
+    <div class="card"><div class="ic" style="color:var(--accent-dark);">${ICONS[item.icon]}</div><h4>${escapeHTML(item.title)}</h4><p>${CATEGORIES[item.category]}</p></div>`).join('');
+}
+
+/* ---------------- agenda ---------------- */
+function renderAgenda(){
+  const list = document.getElementById('agenda-list');
+  const sorted = [...state.agenda].sort((a,b)=> (a.date||'9999').localeCompare(b.date||'9999') || (a.time||'99:99').localeCompare(b.time||'99:99'));
+  list.innerHTML = sorted.length ? sorted.map(t=>`
+    <div class="task-row ${t.done?'done':''}" data-id="${t.id}">
+      <button class="task-check ${t.done?'checked':''}" aria-pressed="${t.done}" aria-label="Marcar tarefa como concluída">${t.done?ICONS.check:''}</button>
+      <div style="flex:1;">
+        <div class="task-title">${escapeHTML(t.title)}</div>
+        <div class="task-meta">${t.date?fmtDate(t.date):'Sem data'}${t.time?' · '+t.time:''}</div>
+      </div>
+      <button class="icon-btn btn-sm" data-del="${t.id}" aria-label="Excluir tarefa" style="width:34px;height:34px;">${ICONS.trash}</button>
+    </div>`).join('') : '<p style="color:var(--text-muted);">Nenhuma tarefa cadastrada ainda.</p>';
+  list.querySelectorAll('[data-id] .task-check').forEach(btn=>{
+    btn.addEventListener('click', async ()=>{
+      const id = btn.closest('[data-id]').dataset.id;
+      const t = state.agenda.find(x=>x.id===id); t.done=!t.done;
+      await stSet('agenda:'+state.user.email, state.agenda);
+      renderAgenda();
+    });
+  });
+  list.querySelectorAll('[data-del]').forEach(btn=>{
+    btn.addEventListener('click', async ()=>{
+      state.agenda = state.agenda.filter(x=>x.id!==btn.dataset.del);
+      await stSet('agenda:'+state.user.email, state.agenda);
+      renderAgenda(); toast('Tarefa removida.');
+    });
+  });
+}
+document.getElementById('agenda-form').addEventListener('submit', async e=>{
+  e.preventDefault();
+  const title = document.getElementById('agenda-title').value.trim();
+  if(!title) return;
+  const date = document.getElementById('agenda-date').value;
+  const time = document.getElementById('agenda-time').value;
+  state.agenda.push({id:uid(), title, date, time, done:false});
+  await stSet('agenda:'+state.user.email, state.agenda);
+  e.target.reset();
+  renderAgenda(); toast('Tarefa adicionada.');
+});
+
+/* ---------------- relax ---------------- */
+let breathInterval=null, pauseInterval=null, pauseSeconds=300;
+function renderRelax(){
+  const sounds = [
+    {id:'rain', label:'Chuva suave', icon:'leaf', type:'noise', caption:'Som contínuo de gotas de chuva caindo, sem batidas ou picos abruptos.'},
+    {id:'waves', label:'Ondas do mar', icon:'compass', type:'wave', caption:'Som de ondas do mar subindo e descendo lentamente, em ciclos regulares.'},
+    {id:'tone', label:'Tom contínuo suave', icon:'headphones', type:'pad', caption:'Um tom grave e constante, sem variações, como um zumbido suave e estável.'}
+  ];
+  document.getElementById('sounds-grid').innerHTML = sounds.map(s=>`
+    <div class="sound-card" data-sound="${s.id}" data-caption="${escapeHTML(s.caption)}">
+      <div class="ic">${ICONS[s.icon]}</div>
+      <div style="flex:1;"><b style="display:block;">${s.label}</b><span style="font-size:.8rem;color:var(--text-muted);" id="status-${s.id}">Toque para ativar</span></div>
+      <input type="range" class="vol-slider" min="0" max="100" value="50" aria-label="Volume de ${s.label}">
+    </div>`).join('');
+  document.querySelectorAll('#sounds-grid .sound-card').forEach(card=>{
+    const id = card.dataset.sound;
+    card.addEventListener('click', e=>{ if(e.target.tagName==='INPUT') return; toggleSound(id, card); });
+    card.querySelector('input').addEventListener('input', e=>{
+      if(state.activeSounds[id]) state.activeSounds[id].gain.gain.value = (e.target.value/100)*0.12;
+    });
+  });
+  document.getElementById('sounds-grid').insertAdjacentHTML('afterend', `<div class="caption-bar on" id="relax-caption-bar" aria-live="polite"><span class="dot" style="background:var(--text-muted);"></span><span id="relax-caption-text">Legendas de áudio: nenhum som tocando no momento.</span></div>`);
+  document.getElementById('pause-timer-display').textContent = fmtTimer(pauseSeconds);
+}
+function toggleSound(id, card){
+  const ctx = ensureAudio(); if(!ctx) return;
+  if(state.activeSounds[id]){
+    state.activeSounds[id].stop(); delete state.activeSounds[id]; card.classList.remove('on');
+    const statusEl = document.getElementById('status-'+id); if(statusEl) statusEl.textContent='Toque para ativar';
+    updateRelaxCaption();
+    return;
+  }
+  let src, gain = ctx.createGain(); gain.gain.value=0.06; gain.connect(ctx.destination);
+  if(card.dataset.sound==='tone'){
+    src = ctx.createOscillator(); src.type='sine'; src.frequency.value=196; src.connect(gain); src.start();
+  } else {
+    const bufferSize = 2*ctx.sampleRate;
+    const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+    const data = buffer.getChannelData(0);
+    for(let i=0;i<bufferSize;i++) data[i] = (Math.random()*2-1) * (card.dataset.sound==='waves'? (0.5+0.5*Math.sin(i/8000)) : 1);
+    src = ctx.createBufferSource(); src.buffer=buffer; src.loop=true;
+    const filter = ctx.createBiquadFilter(); filter.type='lowpass'; filter.frequency.value = card.dataset.sound==='waves'?500:900;
+    src.connect(filter); filter.connect(gain); src.start();
+  }
+  state.activeSounds[id] = {stop:()=>{ try{src.stop();}catch(e){} }, gain};
+  card.classList.add('on');
+  const statusEl = document.getElementById('status-'+id); if(statusEl) statusEl.textContent='Tocando agora';
+  updateRelaxCaption();
+}
+function updateRelaxCaption(){
+  const active = document.querySelectorAll('#sounds-grid .sound-card.on');
+  const textEl = document.getElementById('relax-caption-text');
+  if(!textEl) return;
+  if(!active.length){ textEl.textContent='Legendas de áudio: nenhum som tocando no momento.'; return; }
+  const parts = Array.from(active).map(c=> c.dataset.caption);
+  textEl.textContent = 'Legendas de áudio: ' + parts.join(' · ');
+}
+function stopAllSounds(){ Object.values(state.activeSounds).forEach(s=>s.stop()); state.activeSounds={}; document.querySelectorAll('#sounds-grid .sound-card').forEach(c=>c.classList.remove('on')); }
+
+function startBreath(){
+  const phases = [{label:'Inspire',dur:4},{label:'Segure',dur:4},{label:'Expire',dur:6}];
+  let pi=0, t=phases[0].dur;
+  const textEl = document.getElementById('breath-phase-text');
+  const ring = document.querySelector('#relax-breath .r3');
+  function tick(){
+    textEl.textContent = `${phases[pi].label} (${t})`;
+    ring.style.transform = phases[pi].label==='Expire' ? 'scale(.85)' : phases[pi].label==='Inspire' ? 'scale(1.15)' : 'scale(1.05)';
+    t--;
+    if(t<0){ pi=(pi+1)%phases.length; t=phases[pi].dur; }
+  }
+  tick();
+  breathInterval = setInterval(tick, 1000);
+}
+function stopBreath(){ clearInterval(breathInterval); breathInterval=null; const el=document.getElementById('breath-phase-text'); if(el) el.textContent='Pronto'; const ring=document.querySelector('#relax-breath .r3'); if(ring) ring.style.transform=''; }
+document.getElementById('breath-start').addEventListener('click', ()=>{ stopBreath(); startBreath(); });
+document.getElementById('breath-stop').addEventListener('click', stopBreath);
+
+function fmtTimer(s){ const m=Math.floor(s/60), sec=s%60; return `${String(m).padStart(2,'0')}:${String(sec).padStart(2,'0')}`; }
+document.querySelectorAll('[data-timer]').forEach(b=> b.addEventListener('click', ()=>{ pauseSeconds=parseInt(b.dataset.timer,10); document.getElementById('pause-timer-display').textContent=fmtTimer(pauseSeconds); }));
+document.getElementById('pause-timer-start').addEventListener('click', function(){
+  if(pauseInterval){ clearInterval(pauseInterval); pauseInterval=null; this.textContent='Iniciar'; return; }
+  this.textContent='Pausar';
+  pauseInterval = setInterval(()=>{
+    pauseSeconds--; document.getElementById('pause-timer-display').textContent = fmtTimer(Math.max(pauseSeconds,0));
+    if(pauseSeconds<=0){ clearInterval(pauseInterval); pauseInterval=null; toast('Tempo de pausa concluído.'); playTone(440,0.4); pauseSeconds=300; document.getElementById('pause-timer-start').textContent='Iniciar'; }
+  },1000);
+});
+
+/* ---------------- learning library ---------------- */
+const ARTICLES = [
+  {id:'o-que-e-tea', tag:'TEA', title:'Entendendo o Transtorno do Espectro Autista', icon:'brain',
+   body:`<p>O Transtorno do Espectro Autista (TEA) é uma condição do neurodesenvolvimento que influencia a forma como uma pessoa percebe o mundo, se comunica e interage socialmente. Por ser um espectro, ele se manifesta de maneiras muito diferentes de pessoa para pessoa.</p>
+   <h3>Características comuns</h3><p>Podem incluir preferência por rotinas previsíveis, interesses intensos e específicos, formas particulares de processar estímulos sensoriais e diferenças na comunicação social. Nenhuma dessas características é, por si só, um problema — elas fazem parte de uma forma legítima de existir no mundo.</p>
+   <h3>Como apoiar</h3><p>Respeitar o ritmo da pessoa, oferecer previsibilidade, evitar sobrecarga sensorial e ouvir genuinamente sobre suas necessidades são atitudes que fazem diferença no dia a dia.</p>`},
+  {id:'tdah-cotidiano', tag:'TDAH', title:'TDAH: estratégias práticas para o dia a dia', icon:'zap',
+   body:`<p>O Transtorno de Déficit de Atenção e Hiperatividade (TDAH) afeta funções executivas como organização, foco e regulação de impulsos. Isso não é falta de esforço — é uma diferença real na forma como o cérebro gerencia atenção e tempo.</p>
+   <h3>Estratégias que ajudam</h3><p>Dividir tarefas grandes em passos pequenos, usar temporizadores visuais, reduzir estímulos concorrentes durante o foco e criar rotinas com lembretes externos são formas eficazes de apoiar a execução de tarefas.</p>
+   <h3>Sobre autocompaixão</h3><p>Esquecer compromissos ou se distrair não é uma falha de caráter. Ajustar o ambiente para as próprias necessidades é uma estratégia legítima, não um "atalho".</p>`},
+  {id:'dislexia-leitura', tag:'Dislexia', title:'Dislexia: como tornar a leitura mais acessível', icon:'book',
+   body:`<p>A dislexia é uma diferença no processamento da linguagem escrita que pode tornar a leitura mais lenta ou mais cansativa, sem relação com inteligência.</p>
+   <h3>Ajustes que fazem diferença</h3><p>Fontes com espaçamento maior entre letras, maior espaçamento entre linhas, textos mais curtos por bloco e a opção de ouvir o conteúdo em voz alta reduzem significativamente a fadiga durante a leitura.</p>
+   <h3>No Clareza</h3><p>Você pode ativar a fonte de leitura facilitada e o recurso de leitura em voz alta a qualquer momento, no painel de acessibilidade.</p>`},
+  {id:'organizacao-rotina', tag:'Organização', title:'Construindo uma rotina que funciona para você', icon:'calendar',
+   body:`<p>Rotinas rígidas nem sempre funcionam para todo mundo — e tudo bem. O objetivo de uma rotina é reduzir a carga de decisões repetitivas, não impor rigidez.</p>
+   <h3>Passos práticos</h3><p>Comece registrando apenas 2 ou 3 tarefas fixas por dia. Use horários aproximados em vez de exatos, se isso reduzir a ansiedade. Revise e ajuste a rotina semanalmente, sem culpa quando algo não sai como planejado.</p>`},
+  {id:'estrategias-concentracao', tag:'Concentração', title:'Estratégias para sustentar o foco', icon:'target',
+   body:`<p>Manter a concentração depende menos de "força de vontade" e mais de ambiente, ritmo e clareza sobre a tarefa.</p>
+   <h3>O que ajuda</h3><p>Trabalhar em blocos curtos com pausas programadas, eliminar notificações durante o foco, e ter clareza visual sobre o que precisa ser feito antes de começar reduzem a sobrecarga mental.</p>`},
+  {id:'sobrecarga-sensorial', tag:'Bem-estar', title:'Reconhecendo e lidando com sobrecarga sensorial', icon:'ear',
+   body:`<p>Sobrecarga sensorial acontece quando o cérebro recebe mais estímulos — sons, luzes, texturas — do que consegue processar confortavelmente naquele momento.</p>
+   <h3>Sinais comuns</h3><p>Irritabilidade repentina, dificuldade de concentração, vontade de se afastar do ambiente ou desconforto físico sem causa aparente.</p>
+   <h3>O que pode ajudar</h3><p>Reduzir a luz e o som ao redor, fazer pausas em ambientes tranquilos e usar a área de relaxamento do Clareza para respiração guiada são formas simples de regular o sistema nervoso.</p>`},
+  {id:'comunicacao-alternativa', tag:'Comunicação', title:'Formas diferentes de se comunicar são válidas', icon:'chat',
+   body:`<p>Comunicação não precisa seguir um único padrão. Algumas pessoas se expressam melhor por escrito, outras por imagens, outras precisam de mais tempo antes de responder.</p>
+   <h3>No ambiente digital</h3><p>Ferramentas como esta plataforma priorizam texto claro, sem pressa e sem excesso de estímulos, justamente para acomodar diferentes formas de processar e responder.</p>`},
+  {id:'acessibilidade-web', tag:'Acessibilidade', title:'O que torna um site realmente acessível', icon:'sliders',
+   body:`<p>Acessibilidade vai além de cumprir requisitos técnicos — é sobre reduzir barreiras reais que impedem alguém de usar uma ferramenta com autonomia.</p>
+   <h3>Elementos essenciais</h3><p>Contraste ajustável, navegação completa por teclado, texto alternativo em imagens, tipografia legível e ausência de animações abruptas ou obrigatórias fazem parte de uma experiência verdadeiramente inclusiva.</p>`},
+  {id:'libras-comunicacao', tag:'Surdez', title:'Libras: por que a tradução em sinais importa', icon:'ear',
+   body:`<p>A Língua Brasileira de Sinais (Libras) é a primeira língua de grande parte da comunidade surda no Brasil — não uma tradução literal do Português, mas uma língua completa, com gramática própria.</p>
+   <h3>Texto não substitui Libras</h3><p>Para muitas pessoas surdas, ler em Português é como ler em uma segunda língua. Um avatar tradutor ou intérprete humano em Libras torna o conteúdo genuinamente acessível, e não apenas tecnicamente disponível.</p>
+   <h3>No Clareza</h3><p>O painel de acessibilidade permite ativar o VLibras, avatar público de tradução para Libras, em qualquer página da plataforma.</p>`},
+  {id:'legendas-uso', tag:'Surdez', title:'Legendas: mais do que texto na tela', icon:'chat',
+   body:`<p>Legendas de qualidade não apenas transcrevem falas — também indicam sons ambientes, mudanças de tom e outros elementos sonoros relevantes para o entendimento da cena.</p>
+   <h3>Boas práticas</h3><p>Manter as legendas sincronizadas, evitar textos muito longos por vez e descrever sons não verbais (como "chuva ao fundo" ou "música suave") tornam o conteúdo de áudio verdadeiramente compreensível sem depender da audição.</p>
+   <h3>Nos sons ambientes do Clareza</h3><p>Cada som da Área de Relaxamento tem uma legenda de texto descrevendo o que está tocando, visível a qualquer momento no painel de acessibilidade.</p>`},
+  {id:'leitores-de-tela', tag:'Deficiência visual', title:'Leitores de tela e descrição de áudio na prática', icon:'eye',
+   body:`<p>Leitores de tela como NVDA, JAWS, VoiceOver e TalkBack convertem o conteúdo da tela em fala ou braille. Para funcionarem bem, o site precisa expor rótulos claros, estrutura de títulos e regiões de navegação (landmarks).</p>
+   <h3>Descrição de áudio</h3><p>Imagens e ilustrações que carregam significado precisam de uma descrição textual equivalente — não apenas "imagem", mas o que ela realmente mostra. Isso permite que uma pessoa cega participe da mesma experiência que uma pessoa vidente.</p>
+   <h3>No Clareza</h3><p>Todo o site usa marcação semântica e rótulos descritivos, e a opção "Descrição de áudio" no painel de acessibilidade revela em texto o conteúdo de ilustrações usadas nas atividades.</p>`}
+];
+function renderLearn(){
+  document.getElementById('learn-grid').innerHTML = ARTICLES.map(a=>`
+    <button class="article-card" style="text-align:left;" data-article="${a.id}">
+      <div class="tag">${a.tag}</div>
+      <h3 style="margin:8px 0 6px;">${escapeHTML(a.title)}</h3>
+      <p style="color:var(--text-muted);font-size:.88rem;margin:0;">${a.body.replace(/<[^>]+>/g,'').slice(0,110)}...</p>
+    </button>`).join('');
+  document.querySelectorAll('[data-article]').forEach(b=> b.addEventListener('click', ()=> openArticle(b.dataset.article)));
+}
+function openArticle(id){
+  const a = ARTICLES.find(x=>x.id===id); if(!a) return;
+  document.getElementById('article-content').innerHTML = `<span class="badge" style="margin-bottom:10px;">${a.tag}</span><h1>${escapeHTML(a.title)}</h1>${a.body}`;
+  document.querySelectorAll('.view').forEach(v=>v.hidden=true);
+  document.getElementById('view-article').hidden=false;
+}
+document.getElementById('article-back').addEventListener('click', ()=> showView('learn'));
+
+/* ---------------- stats ---------------- */
+let chartWeekly=null, chartCategory=null;
+function renderStats(){
+  const p = state.progress;
+  const all = [...Object.entries(p.activities).flatMap(([id,arr])=>arr.map(r=>({...r,id}))), ...Object.entries(p.games).flatMap(([id,arr])=>arr.map(r=>({...r,id})))];
+  const totalPlays = all.length;
+  const avgPct = totalPlays ? Math.round(all.reduce((s,r)=> s+(r.total? r.score/r.total*100:0),0)/totalPlays) : 0;
+  document.getElementById('stats-summary').innerHTML = `
+    <div class="stat-card"><b>${p.totalMinutes}</b><span>Minutos totais</span></div>
+    <div class="stat-card"><b>${totalPlays}</b><span>Sessões realizadas</span></div>
+    <div class="stat-card"><b>${avgPct}%</b><span>Desempenho médio</span></div>
+    <div class="stat-card"><b>${Object.keys(p.activities).length + Object.keys(p.games).length}</b><span>Atividades/jogos diferentes</span></div>`;
+
+  const days = Array.from({length:7},(_,i)=>{ const d=new Date(); d.setDate(d.getDate()-(6-i)); return d; });
+  const weeklyCounts = days.map(d=>{
+    const key = d.toISOString().slice(0,10);
+    return all.filter(r=> new Date(r.date).toISOString().slice(0,10)===key).length;
+  });
+  const catStyle = getComputedStyle(document.documentElement);
+  const accent = catStyle.getPropertyValue('--accent').trim() || '#3D7A6E';
+  const textMuted = catStyle.getPropertyValue('--text-muted').trim() || '#666';
+  if(chartWeekly) chartWeekly.destroy();
+  chartWeekly = new Chart(document.getElementById('chart-weekly'), {
+    type:'bar',
+    data:{ labels: days.map(d=>d.toLocaleDateString('pt-BR',{weekday:'short'})), datasets:[{label:'Sessões', data:weeklyCounts, backgroundColor:accent, borderRadius:6}] },
+    options:{ plugins:{legend:{display:false}}, scales:{ y:{beginAtZero:true, ticks:{precision:0, color:textMuted}, grid:{color:'rgba(128,128,128,.15)'}}, x:{ticks:{color:textMuted}, grid:{display:false}} } }
+  });
+  const catTotals = {};
+  all.forEach(r=>{ const item=getCatalogItem(r.id); if(!item) return; const cat=CATEGORIES[item.category]||'Outro'; catTotals[cat]=(catTotals[cat]||0)+1; });
+  if(chartCategory) chartCategory.destroy();
+  chartCategory = new Chart(document.getElementById('chart-category'), {
+    type:'doughnut',
+    data:{ labels:Object.keys(catTotals).length?Object.keys(catTotals):['Sem dados'], datasets:[{data:Object.values(catTotals).length?Object.values(catTotals):[1], backgroundColor:['#3D7A6E','#C48A2E','#B5602F','#5B7DB1','#4C8567','#8A6FB1','#B24A42','#6f8f8a']}] },
+    options:{ plugins:{legend:{position:'bottom', labels:{color:textMuted, boxWidth:12, font:{size:11}}}} }
+  });
+
+  const history = [...all].sort((a,b)=>b.date-a.date).slice(0,10);
+  document.getElementById('stats-history').innerHTML = history.length ? history.map(r=>{
+    const item = getCatalogItem(r.id);
+    return `<div class="list-row"><div class="ic">${ICONS[item?.icon||'star']}</div><div class="meta"><b>${escapeHTML(item?.title||r.id)}</b><span>${new Date(r.date).toLocaleString('pt-BR')}</span></div><span class="badge">${r.score}/${r.total}</span></div>`;
+  }).join('') : '<p style="color:var(--text-muted);">Sem histórico ainda.</p>';
+}
+
+/* ---------------- chat (simulated support) ---------------- */
+let chatInitDone=false;
+function initChat(){
+  if(chatInitDone) return; chatInitDone=true;
+  const body = document.getElementById('chat-body');
+  body.innerHTML = `<div class="msg system">Hoje, ${new Date().toLocaleDateString('pt-BR')}</div>`;
+  addBotMessage(`Olá, ${state.user.name.split(' ')[0]}! Sou a Ana, da equipe de apoio do Clareza. Como posso ajudar hoje?`);
+  renderChatSuggestions(['Como funciona a agenda?','Quero dicas de concentração','Como ajustar a acessibilidade?','Preciso de apoio emocional']);
+}
+function addMsg(text, who){
+  const body = document.getElementById('chat-body');
+  const el = document.createElement('div'); el.className='msg '+who; el.textContent=text;
+  body.appendChild(el); body.scrollTop = body.scrollHeight;
+}
+function addBotMessage(text){
+  const body = document.getElementById('chat-body');
+  const typing = document.createElement('div'); typing.className='typing-dots'; typing.innerHTML='<span></span><span></span><span></span>';
+  body.appendChild(typing); body.scrollTop = body.scrollHeight;
+  trackTimer(setTimeout(()=>{ typing.remove(); addMsg(text,'bot'); }, 700+Math.random()*500));
+}
+function renderChatSuggestions(list){
+  const el = document.getElementById('chat-suggest');
+  el.innerHTML = list.map(s=>`<button type="button">${escapeHTML(s)}</button>`).join('');
+  el.querySelectorAll('button').forEach(b=> b.addEventListener('click', ()=> sendChat(b.textContent)));
+}
+function botReply(msg){
+  const m = msg.toLowerCase();
+  if(m.includes('agenda')) return {text:'A Agenda fica no menu lateral. Você pode adicionar tarefas com data e horário, marcar como concluídas e acompanhar seus compromissos do dia direto no Painel.', suggest:['Como funcionam os jogos?','Como ajustar a fonte?']};
+  if(m.includes('concentra') || m.includes('foco')) return {text:'Recomendo experimentar os Exercícios de Concentração na área de Atividades, e também o Temporizador de pausa na Área de Relaxamento — pausas curtas e regulares ajudam bastante.', suggest:['Ir para relaxamento','Quero dicas de leitura']};
+  if(m.includes('acessibilidade') || m.includes('fonte') || m.includes('contraste')) return {text:'No ícone de controles deslizantes, no topo da tela, você encontra o painel de acessibilidade: tamanho de fonte, alto contraste, modo escuro, espaçamento entre linhas e leitura em voz alta.', suggest:['Preciso de apoio emocional']};
+  if(m.includes('emocional') || m.includes('ansios') || m.includes('triste') || m.includes('sobrecarreg') || m.includes('cansad')) return {text:'Sinto muito que esteja se sentindo assim. A Área de Relaxamento tem respiração guiada que pode ajudar agora. Se o sentimento persistir, considere conversar com um profissional de confiança — você não precisa lidar com isso sozinho.', suggest:['Ir para relaxamento','Como funciona a agenda?']};
+  if(m.includes('jog')) return {text:'Na aba Jogos você encontra quebra-cabeça, labirinto, memória, jogo de sons e outros — todos com níveis de dificuldade e progresso salvo automaticamente.', suggest:['Como ajustar a fonte?']};
+  if(m.includes('leitura')) return {text:'A Biblioteca de Aprendizado tem artigos curtos sobre TEA, TDAH, dislexia e estratégias práticas. Você também pode ativar a leitura em voz alta em qualquer página.', suggest:['Como ajustar a fonte?']};
+  return {text:'Entendido. Posso te ajudar com dúvidas sobre atividades, jogos, agenda, acessibilidade ou apoio emocional. Sobre o que você gostaria de saber mais?', suggest:['Como funciona a agenda?','Quero dicas de concentração','Como ajustar a acessibilidade?']};
+}
+function sendChat(text){
+  if(!text || !text.trim()) return;
+  addMsg(text,'me');
+  document.getElementById('chat-suggest').innerHTML='';
+  const r = botReply(text);
+  addBotMessage(r.text);
+  trackTimer(setTimeout(()=> renderChatSuggestions(r.suggest||['Como funciona a agenda?']), 1000));
+}
+document.getElementById('chat-form').addEventListener('submit', e=>{
+  e.preventDefault();
+  const input = document.getElementById('chat-input');
+  const val = input.value; input.value='';
+  sendChat(val);
+});
+
+/* ---------------- settings ---------------- */
+function renderSettings(){
+  document.getElementById('settings-name').value = state.user.name;
+  document.getElementById('settings-email').value = state.user.email;
+  mountA11yControls(document.getElementById('settings-a11y-mount'));
+  document.getElementById('pref-lang').value = state.settings.lang||'pt-BR';
+  document.getElementById('pref-notify').checked = state.settings.notify!==false;
+  document.getElementById('pref-sound').checked = !!state.settings.uiSound;
+}
+document.querySelectorAll('.settings-tabs button').forEach(tab=>{
+  tab.addEventListener('click', ()=>{
+    document.querySelectorAll('.settings-tabs button').forEach(t=>{t.classList.remove('active');t.setAttribute('aria-selected','false');});
+    tab.classList.add('active'); tab.setAttribute('aria-selected','true');
+    document.querySelectorAll('.settings-panel').forEach(p=>p.hidden=true);
+    document.getElementById('tab-'+tab.dataset.tab).hidden=false;
+  });
+});
+document.getElementById('save-profile').addEventListener('click', async ()=>{
+  state.user.name = document.getElementById('settings-name').value.trim() || state.user.name;
+  const users = await getUsers();
+  const idx = users.findIndex(u=>u.email===state.user.email);
+  if(idx>-1){ users[idx]=state.user; await saveUsers(users); }
+  updateHeaderIdentity();
+  toast('Perfil atualizado.');
+});
+document.getElementById('avatar-btn').addEventListener('click', ()=> document.getElementById('avatar-input').click());
+document.getElementById('avatar-input').addEventListener('change', e=>{
+  const file = e.target.files[0]; if(!file) return;
+  const reader = new FileReader();
+  reader.onload = async ()=>{
+    state.user.avatar = reader.result;
+    const users = await getUsers();
+    const idx = users.findIndex(u=>u.email===state.user.email);
+    if(idx>-1){ users[idx]=state.user; await saveUsers(users); }
+    updateHeaderIdentity(); renderSettings(); toast('Foto atualizada.');
+  };
+  reader.readAsDataURL(file);
+});
+document.getElementById('save-password').addEventListener('click', async ()=>{
+  const val = document.getElementById('settings-password').value;
+  if(!val){ toast('Digite uma nova senha para atualizar.'); return; }
+  state.user.pass = simpleObfuscate(val);
+  const users = await getUsers();
+  const idx = users.findIndex(u=>u.email===state.user.email);
+  if(idx>-1){ users[idx]=state.user; await saveUsers(users); }
+  document.getElementById('settings-password').value='';
+  toast('Senha atualizada.');
+});
+document.getElementById('clear-progress').addEventListener('click', async ()=>{
+  if(!confirm('Tem certeza que deseja apagar todo o seu progresso? Esta ação não pode ser desfeita.')) return;
+  state.progress = {activities:{}, games:{}, totalMinutes:0, sessions:[], streak:0, lastActive:todayISO()};
+  await stSet('progress:'+state.user.email, state.progress);
+  toast('Progresso apagado.');
+});
+document.getElementById('pref-lang').addEventListener('change', async e=>{ state.settings.lang=e.target.value; await stSet('settings:'+state.user.email, state.settings); if(e.target.value!=='pt-BR') toast('Este idioma estará disponível em breve. Mantendo Português por enquanto.'); });
+document.getElementById('pref-notify').addEventListener('change', async e=>{ state.settings.notify=e.target.checked; await stSet('settings:'+state.user.email, state.settings); });
+document.getElementById('pref-sound').addEventListener('change', async e=>{ state.settings.uiSound=e.target.checked; await stSet('settings:'+state.user.email, state.settings); });
+
+/* ---------------- global navigation & nav buttons ---------------- */
+document.querySelectorAll('[data-nav="landing"]').forEach(el=> el.addEventListener('click', e=>{ e.preventDefault(); showScreen('landing'); }));
+document.querySelectorAll('[data-action="go-login"]').forEach(el=> el.addEventListener('click', ()=> showScreen('login')));
+document.querySelectorAll('[data-action="go-signup"]').forEach(el=> el.addEventListener('click', ()=> showScreen('signup')));
+document.querySelectorAll('[data-action="go-forgot"]').forEach(el=> el.addEventListener('click', ()=> showScreen('forgot')));
+document.querySelectorAll('.side-link[data-view]').forEach(el=> el.addEventListener('click', ()=> showView(el.dataset.view)));
+document.querySelectorAll('.mobile-tabbar [data-view]').forEach(el=> el.addEventListener('click', ()=> showView(el.dataset.view)));
+document.querySelectorAll('.topbar [data-view]').forEach(el=> el.addEventListener('click', ()=> showView(el.dataset.view)));
+document.querySelectorAll('[data-action="logout"]').forEach(el=> el.addEventListener('click', logout));
+
+document.getElementById('btn-open-a11y').addEventListener('click', openA11yPanel);
+document.getElementById('btn-close-a11y').addEventListener('click', closeA11yPanel);
+document.getElementById('a11y-overlay').addEventListener('click', closeA11yPanel);
+document.addEventListener('keydown', e=>{ if(e.key==='Escape' && document.getElementById('a11y-panel').classList.contains('active')) closeA11yPanel(); });
+document.getElementById('btn-tts').addEventListener('click', readCurrentView);
+document.getElementById('btn-theme').addEventListener('click', ()=> updateSetting('dark', !state.settings.dark));
+
+document.getElementById('global-search').addEventListener('input', e=>{
+  const q = e.target.value.trim().toLowerCase();
+  if(state.currentView==='activities' || state.currentView==='games'){
+    const type = state.currentView==='activities' ? 'activity':'game';
+    const grid = document.getElementById(type==='activity'?'activities-grid':'games-grid');
+    grid.querySelectorAll('.cat-card').forEach(card=>{
+      const item = getCatalogItem(card.dataset.open);
+      const match = !q || item.title.toLowerCase().includes(q) || item.desc.toLowerCase().includes(q);
+      card.style.display = match ? '' : 'none';
+    });
+  } else if(state.currentView==='learn'){
+    document.querySelectorAll('#learn-grid .article-card').forEach(card=>{
+      const a = ARTICLES.find(x=>x.id===card.dataset.article);
+      card.style.display = (!q || a.title.toLowerCase().includes(q)) ? '' : 'none';
+    });
+  }
+});
+
+/* ---------------- auth forms ---------------- */
+function showFormError(id, msg){ const el=document.getElementById(id); el.textContent=msg; el.style.display='block'; }
+function showFormSuccess(id, msg){ const el=document.getElementById(id); el.textContent=msg; el.style.display='block'; }
+
+document.getElementById('form-login').addEventListener('submit', async e=>{
+  e.preventDefault(); clearFormMessages();
+  const email = document.getElementById('login-email').value;
+  const pass = document.getElementById('login-password').value;
+  const keep = document.getElementById('login-keep').checked;
+  const r = await handleLogin(email,pass,keep);
+  if(r.error) return showFormError('login-error', r.error);
+  await enterApp(r.user);
+  toast(`Bem-vindo, ${r.user.name.split(' ')[0]}!`);
+});
+document.getElementById('form-signup').addEventListener('submit', async e=>{
+  e.preventDefault(); clearFormMessages();
+  const name = document.getElementById('signup-name').value;
+  const email = document.getElementById('signup-email').value;
+  const pass = document.getElementById('signup-password').value;
+  if(pass.length<6) return showFormError('signup-error','A senha deve ter ao menos 6 caracteres.');
+  const r = await handleSignup(name,email,pass);
+  if(r.error) return showFormError('signup-error', r.error);
+  await stSet('auth:session', {email:r.user.email, keep:true});
+  await enterApp(r.user);
+  toast('Conta criada com sucesso!');
+});
+document.getElementById('form-forgot').addEventListener('submit', async e=>{
+  e.preventDefault(); clearFormMessages();
+  const email = document.getElementById('forgot-email').value;
+  const r = await handleForgot(email);
+  if(r.error) return showFormError('forgot-error', r.error);
+  showFormSuccess('forgot-success', 'Se este e-mail estiver cadastrado, instruções de recuperação foram enviadas (simulação de prototipagem).');
+  e.target.reset();
+});
+
+/* ---------------- init ---------------- */
+async function init(){
+  renderLandingShowcase();
+  applySettings(DEFAULT_SETTINGS);
+  await bootSession();
+}
+init();
+
+})();
+</script>
+</body>
+</html>
